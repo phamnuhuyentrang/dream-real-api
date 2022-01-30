@@ -2,10 +2,9 @@
 	"name": "dream-real-api",
 	"version": "1.0.0",
 	"description": "dream real api",
-	"main": "source/server.ts",
+	"main": "api/server.ts",
 	"scripts": {
-		"dev": "nodemon source/server.ts",
-		"build": "rm -rf build/ && prettier --write source/ && tsc"
+		"start": "nodemon api/server.js"
 	},
 	"author": "",
 	"license": "ISC",
