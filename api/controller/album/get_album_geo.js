@@ -1,0 +1,49 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const server_1 = require("../../server");
+const dotenv = __importStar(require("dotenv"));
+dotenv.config();
+const getAlbumGeo = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let req_body = req.query;
+    let offset = req_body.offset;
+    let user_id = req_body.user_id;
+    console.log(user_id);
+    server_1.conn.getConnector().getConnection((err, connection) => {
+        if (err) {
+            return res.status(400).json({
+                message: "Error when connecting database: " + err
+            });
+        }
+        else {
+            var sql = "SELECT a.id as album_id, a.created_at, a.description, u.first_name, u.last_name, u.avatar, u.id as user_id, g.longitude, g.latitude, t.title, t.slug, a.image, co.comment, re.react, user_react.emoji as user_react FROM album a LEFT JOIN geo g ON a.geo_id = g.id LEFT JOIN user u ON a.user_id = u.id LEFT JOIN tag t ON a.tag_id = t.id JOIN (SELECT a.id, COUNT(c.id) as comment FROM album a LEFT JOIN comment c ON a.id = c.album_id GROUP BY a.id) co ON a.id = co.id JOIN (SELECT a.id, COUNT(r.id) as react FROM album a LEFT JOIN react r ON a.id = r.album_id GROUP BY a.id) re ON a.id = re.id LEFT JOIN (SELECT r.emoji, a.id FROM user u LEFT JOIN react r ON u.id = r.user_id LEFT JOIN album a ON r.album_id = a.id WHERE u.id = ?) user_react ON user_react.id = a.id LIMIT 10 OFFSET " + offset;
+            connection.query(sql, [user_id], (err, rows) => {
+                if (err) {
+                    return res.status(400).json({
+                        message: "Error when getting album: " + err
+                    });
+                }
+                else {
+                    req.album = JSON.parse(JSON.stringify(rows));
+                    return next();
+                }
+            });
+        }
+    });
+});
+exports.default = getAlbumGeo;
