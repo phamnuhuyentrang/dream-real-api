@@ -10,18 +10,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const connector_1 = __importDefault(require("../database/connector"));
+const connector_1 = __importDefault(require("./database/connector"));
 const express_1 = __importDefault(require("express"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const main_controller_1 = __importDefault(require("./controller/main_controller"));
+const main_controller_1 = __importDefault(require("./api/controller/main_controller"));
 dotenv.config();
 exports.conn = new connector_1.default();
 const app = express_1.default();
 app.use(cookie_parser_1.default());
 app.use(body_parser_1.default.json());
+
+app.get("/", (req, res) => {
+    return res.status(200).json({
+        message: "Welcome to API Dream Real"
+    });
+})
+
 app.post("/usn_validity", main_controller_1.default.check_usn_validity, (req, res) => {
     return res.status(200).json({
         message: "Username is available to use"

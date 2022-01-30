@@ -2,9 +2,9 @@
 	"name": "dream-real-api",
 	"version": "1.0.0",
 	"description": "dream real api",
-	"main": "api/server.ts",
+	"main": "./server.ts",
 	"scripts": {
-		"start": "nodemon api/server.js",
+		"start": "nodemon ./server.js",
 		"deploy": "npm install && npm run start"
 	},
 	"author": "",

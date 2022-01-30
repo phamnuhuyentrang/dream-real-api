@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const server_1 = require("../../server");
+const server_1 = require("../../../server");
 const check_usn_validity = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let req_body = yield req.body;
     let username = req_body.username;

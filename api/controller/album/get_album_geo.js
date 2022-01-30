@@ -16,7 +16,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const server_1 = require("../../server");
+const server_1 = require("../../../server");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const getAlbumGeo = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

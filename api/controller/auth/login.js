@@ -16,7 +16,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const server_1 = require("../../server");
+const server_1 = require("../../../server");
 const crypto = __importStar(require("crypto"));
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let req_body = yield req.body;

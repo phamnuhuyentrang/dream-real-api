@@ -20,7 +20,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
-const server_1 = require("../../server");
+const server_1 = require("../../../server");
 const dotenv = __importStar(require("dotenv"));
 const crypto_1 = __importDefault(require("crypto"));
 const aws_sdk_1 = __importDefault(require("aws-sdk"));

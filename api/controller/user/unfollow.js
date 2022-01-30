@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const server_1 = require("../../server");
+const server_1 = require("../../../server");
 const unFollow = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let req_body = req.body;
     let user_id = req_body.user_id;

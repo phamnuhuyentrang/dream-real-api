@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const server_1 = require("../../../server");
+const server_1 = require("../../../../server");
 const moment_1 = __importDefault(require("moment"));
 const ReactComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     // let uuid: string = crypto.randomUUID();
