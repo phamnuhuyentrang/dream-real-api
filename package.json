@@ -4,7 +4,8 @@
 	"description": "dream real api",
 	"main": "api/server.ts",
 	"scripts": {
-		"start": "nodemon api/server.js"
+		"start": "nodemon api/server.js",
+		"deploy": "npm install && npm run start"
 	},
 	"author": "",
 	"license": "ISC",
