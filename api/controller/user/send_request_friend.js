@@ -14,24 +14,15 @@ const sendRequestFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     let req_body = req.body;
     let user_id = req_body.user_id;
     let friend_id = req_body.friend_id;
-    server_1.conn.getConnector().getConnection((err, connection) => {
+    var sql = "INSERT INTO friend (user_id, friend_id) VALUES ?";
+    server_1.conn.getConnector().query(sql, [[[user_id, friend_id]]], (err, rows) => {
         if (err) {
             return res.status(400).json({
-                message: "Error when connecting database: " + err
+                message: "Error when send request friend: " + err
             });
         }
         else {
-            var sql = "INSERT INTO friend (user_id, friend_id) VALUES ?";
-            connection.query(sql, [[[user_id, friend_id]]], (err, rows) => {
-                if (err) {
-                    return res.status(400).json({
-                        message: "Error when send request friend: " + err
-                    });
-                }
-                else {
-                    return next();
-                }
-            });
+            return next();
         }
     });
 });

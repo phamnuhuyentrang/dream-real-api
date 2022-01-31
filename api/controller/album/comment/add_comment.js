@@ -20,24 +20,15 @@ const addComment = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     let user_id = req_body.user_id;
     let context = req_body.context;
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD HH:mm:ss");
-    server_1.conn.getConnector().getConnection((err, connection) => {
+    var sql = "INSERT INTO comment (user_id, album_id, created_at, context) VALUES ?";
+    server_1.conn.getConnector().query(sql, [[[user_id, album_id, created_at, context]]], (err, rows) => {
         if (err) {
             return res.status(400).json({
-                message: "Error when connecting database: " + err
+                message: "Error when verifying live location: " + err.message
             });
         }
         else {
-            var sql = "INSERT INTO comment (user_id, album_id, created_at, context) VALUES ?";
-            connection.query(sql, [[[user_id, album_id, created_at, context]]], (err, rows) => {
-                if (err) {
-                    return res.status(400).json({
-                        message: "Error when verifying live location: " + err.message
-                    });
-                }
-                else {
-                    return next();
-                }
-            });
+            return next();
         }
     });
 });

@@ -14,24 +14,15 @@ const unFollow = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     let req_body = req.body;
     let user_id = req_body.user_id;
     let user_follow_id = req_body.user_follow_id;
-    server_1.conn.getConnector().getConnection((err, connection) => {
+    var sql = "DELETE FROM follow WHERE following_id = ? AND follower_id = ?";
+    server_1.conn.getConnector().query(sql, [user_follow_id, user_id], (err, rows) => {
         if (err) {
             return res.status(400).json({
-                message: "Error when connecting database: " + err
+                message: "Error when insert follow: " + err
             });
         }
         else {
-            var sql = "DELETE FROM follow WHERE following_id = ? AND follower_id = ?";
-            connection.query(sql, [user_follow_id, user_id], (err, rows) => {
-                if (err) {
-                    return res.status(400).json({
-                        message: "Error when insert follow: " + err
-                    });
-                }
-                else {
-                    return next();
-                }
-            });
+            return next();
         }
     });
 });

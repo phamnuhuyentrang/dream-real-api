@@ -39,7 +39,7 @@ app.post("/email_validity", main_controller_1.default.check_email_validity, (req
         message: "Email is available to use"
     });
 });
-app.post("/register", main_controller_1.default.register, (req, res) => {
+app.post("/register", [main_controller_1.default.check_usn_validity, main_controller_1.default.check_email_validity, main_controller_1.default.register], (req, res) => {
     return res.status(200).json({
         message: "New user signed up successfully"
     });

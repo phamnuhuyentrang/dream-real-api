@@ -13,32 +13,22 @@ const server_1 = require("../../../server");
 const check_email_validity = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let req_body = yield req.body;
     let email = req_body.email;
-    server_1.conn.getConnector().getConnection((err, connection) => {
+    // Check if username is already in use
+    var sql = "SELECT email FROM user WHERE email = ?";
+    server_1.conn.getConnector().query(sql, [email], (err, email_res) => {
         if (err) {
             return res.status(400).json({
-                message: "Error when connecting database: " + err
+                message: "Error when verifying email: " + err
             });
         }
         else {
-            // Check if username is already in use
-            var sql = "SELECT email FROM user WHERE email = ?";
-            connection.query(sql, [email], (err, email_res) => {
-                if (err) {
-                    return res.status(400).json({
-                        message: "Error when verifying email: " + err
-                    });
-                }
-                else {
-                    if (JSON.parse(JSON.stringify(email_res))[0] != undefined) {
-                        return res.status(400).json({
-                            message: "Email has already been used"
-                        });
-                    }
-                }
-            });
+            if (JSON.parse(JSON.stringify(email_res))[0] != undefined) {
+                return res.status(400).json({
+                    message: "Email has already been used"
+                });
+            }
+            return next();
         }
-        connection.release();
     });
-    return next();
 });
 exports.default = check_email_validity;

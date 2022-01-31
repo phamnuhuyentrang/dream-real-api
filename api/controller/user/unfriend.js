@@ -14,24 +14,15 @@ const unFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     let req_body = req.body;
     let user_id = req_body.user_id;
     let friend_id = req_body.friend_id;
-    server_1.conn.getConnector().getConnection((err, connection) => {
+    var sql = "DELETE FROM friend WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
+    server_1.conn.getConnector().query(sql, [user_id, friend_id, friend_id, user_id], (err, rows) => {
         if (err) {
             return res.status(400).json({
-                message: "Error when connecting database: " + err
+                message: "Error when decline request friend: " + err
             });
         }
         else {
-            var sql = "DELETE FROM friend WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
-            connection.query(sql, [user_id, friend_id, friend_id, user_id], (err, rows) => {
-                if (err) {
-                    return res.status(400).json({
-                        message: "Error when decline request friend: " + err
-                    });
-                }
-                else {
-                    return next();
-                }
-            });
+            return next();
         }
     });
 });

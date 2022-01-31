@@ -22,53 +22,49 @@ const ReactAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
     let emoji = req_body.emoji;
     let action = req_body.action;
-    server_1.conn.getConnector().getConnection((err, connection) => {
-        if (err) {
-            return res.status(400).json({
-                message: "Error when connecting database: " + err
-            });
-        }
-        else {
-            if (action === "new react") {
-                var sql = "INSERT INTO react(created_at, user_id, album_id, emoji) VALUES ?";
-                connection.query(sql, [[[created_at, user_id, album_id, emoji]]], (err, rows) => {
-                    if (err) {
-                        return res.status(400).json({
-                            message: "Error when add reaction: " + err
-                        });
-                    }
-                    else {
-                        return next();
-                    }
+    if (action === "new react") {
+        var sql = "INSERT INTO react(created_at, user_id, album_id, emoji) VALUES ?";
+        server_1.conn.getConnector().query(sql, [[[created_at, user_id, album_id, emoji]]], (err, rows) => {
+            if (err) {
+                return res.status(400).json({
+                    message: "Error when add reaction: " + err
                 });
             }
-            else if (action === "old react") {
-                var sql = "UPDATE react SET updated_at = ?, emoji = ? WHERE user_id = ? AND album_id = ?";
-                connection.query(sql, [created_at, emoji, user_id, album_id], (err, rows) => {
-                    if (err) {
-                        return res.status(400).json({
-                            message: "Error when change reaction: " + err
-                        });
-                    }
-                    else {
-                        return next();
-                    }
+            else {
+                return next();
+            }
+        });
+    }
+    else if (action === "old react") {
+        var sql = "UPDATE react SET updated_at = ?, emoji = ? WHERE user_id = ? AND album_id = ?";
+        server_1.conn.getConnector().query(sql, [created_at, emoji, user_id, album_id], (err, rows) => {
+            if (err) {
+                return res.status(400).json({
+                    message: "Error when change reaction: " + err
                 });
             }
-            else if (action === "remove react") {
-                var sql = "DELETE FROM react WHERE user_id = ? AND album_id = ?";
-                connection.query(sql, [user_id, album_id], (err, rows) => {
-                    if (err) {
-                        return res.status(400).json({
-                            message: "Error when remove reaction: " + err
-                        });
-                    }
-                    else {
-                        return next();
-                    }
+            else {
+                return next();
+            }
+        });
+    }
+    else if (action === "remove react") {
+        var sql = "DELETE FROM react WHERE user_id = ? AND album_id = ?";
+        server_1.conn.getConnector().query(sql, [user_id, album_id], (err, rows) => {
+            if (err) {
+                return res.status(400).json({
+                    message: "Error when remove reaction: " + err
                 });
             }
-        }
-    });
+            else {
+                return next();
+            }
+        });
+    }
+    else {
+        return res.status(400).json({
+            message: "Error when reacting to album: Invalid action"
+        })
+    }
 });
 exports.default = ReactAlbum;

@@ -33,8 +33,8 @@ const s3 = new aws_sdk_1.default.S3({
 });
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     // Local variables
-    let avatar_uri = ""; // avatar (user)
-    let cover_uri = ""; // cover (user)
+    let avatar_uri = null; // avatar (user)
+    let cover_uri = null; // cover (user)
     let lat = "";
     let long = "";
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
@@ -155,74 +155,57 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             long = data.candidates[0].geometry.location.lng;
         }
         // Add to database
-        server_1.conn.getConnector().getConnection((err, connection) => {
+        var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
+        server_1.conn.getConnector().query(sql, [info_lives], (err, geo_rows) => {
             if (err) {
                 return res.status(400).json({
-                    message: "Error when connecting database: " + err
+                    message: "Error when verifying live location: " + err
                 });
             }
             else {
-                var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
-                connection.query(sql, [info_lives], (err, geo_rows) => {
-                    if (err) {
-                        return res.status(400).json({
-                            message: "Error when verifying live location: " + err
-                        });
-                    }
-                    else {
-                        var geo_id = null;
-                        if (JSON.parse(JSON.stringify(geo_rows))[0] != undefined) {
-                            geo_id = JSON.parse(JSON.stringify(geo_rows))[0].id;
-                        }
-                        else {
-                            var sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
-                            connection.query(sql, [[[created_at, lat, long, city, state, country, country_code, info_lives, location_hash]]], (err, result_geos) => {
-                                if (err) {
-                                    return res.status(400).json({
-                                        message: "Error when saving living location: " + err
-                                    });
-                                }
-                                console.log("Insert into geo successfully");
-                                // get geo_id
-                                geo_id = result_geos.insertId;
+                var geo_id = null;
+                if (JSON.parse(JSON.stringify(geo_rows))[0] != undefined) {
+                    geo_id = JSON.parse(JSON.stringify(geo_rows))[0].id;
+                }
+                else {
+                    var sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
+                    server_1.conn.getConnector().query(sql, [[[created_at, lat, long, city, state, country, country_code, info_lives, location_hash]]], (err, result_geos) => {
+                        if (err) {
+                            return res.status(400).json({
+                                message: "Error when saving living location: " + err
                             });
                         }
-                        var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at, geo_id) VALUES ?";
-                        connection.query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at, geo_id]]], function (err, result) {
-                            if (err) {
-                                return res.status(400).json({
-                                    message: "Error when creating new user: " + err
-                                });
-                            }
-                            console.log("Insert into user successfully");
-                        });
-                    }
-                });
-            }
-            connection.release();
-        });
-    }
-    else {
-        server_1.conn.getConnector().getConnection((err, connection) => {
-            if (err) {
-                return res.status(400).json({
-                    message: "Error when connecting database: " + err
-                });
-            }
-            else {
-                var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at) VALUES ?";
-                connection.query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at]]], function (err, result) {
+                        console.log("Insert into geo successfully");
+                        // get geo_id
+                        geo_id = result_geos.insertId;
+                    });
+                }
+                var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at, geo_id) VALUES ?";
+                server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at, geo_id]]], function (err, result) {
                     if (err) {
                         return res.status(400).json({
                             message: "Error when creating new user: " + err
                         });
                     }
-                    console.log("Insert into user successfully");
+                    else {
+                        return next();
+                    }
                 });
-                connection.release();
             }
         });
     }
-    return next();
+    else {
+        var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at) VALUES ?";
+        server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at]]], function (err, result) {
+            if (err) {
+                return res.status(400).json({
+                    message: "Error when creating new user: " + err
+                });
+            }
+            else {
+                return next();
+            }
+        });
+    }
 });
 exports.default = register;

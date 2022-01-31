@@ -20,24 +20,15 @@ const replyTo = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     let context = req_body.context;
     let user_id = req_body.user_id;
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
-    server_1.conn.getConnector().getConnection((err, connection) => {
+    var sql = "INSERT INTO comment(created_at, user_id, context, reply_to) VALUES ?";
+    server_1.conn.getConnector().query(sql, [[[created_at, user_id, context, comment_id]]], (err, rows) => {
         if (err) {
             return res.status(400).json({
-                message: "Error when connecting database: " + err
+                message: "Error when adding a reply to comment: " + err
             });
         }
         else {
-            var sql = "INSERT INTO comment(created_at, user_id, context, reply_to) VALUES ?";
-            connection.query(sql, [[[created_at, user_id, context, comment_id]]], (err, rows) => {
-                if (err) {
-                    return res.status(400).json({
-                        message: "Error when adding a reply to comment: " + err
-                    });
-                }
-                else {
-                    return next();
-                }
-            });
+            return next();
         }
     });
 });

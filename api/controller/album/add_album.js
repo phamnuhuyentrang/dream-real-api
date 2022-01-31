@@ -105,50 +105,42 @@ const createAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         long = data.candidates[0].geometry.location.lng;
     }
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
-    server_1.conn.getConnector().getConnection((err, connection) => {
+    var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
+    server_1.conn.getConnector().query(sql, [location], (err, geo_rows) => {
         if (err) {
             return res.status(400).json({
-                message: "Error when connecting database: " + err
+                message: "Error when collecting existing geo id: " + err
             });
         }
         else {
-            var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
-            connection.query(sql, [location], (err, geo_rows) => {
+            var geo_id = null;
+            if (JSON.parse(JSON.stringify(geo_rows))[0] != undefined) {
+                geo_id = JSON.parse(JSON.stringify(geo_rows))[0].id;
+            }
+            else {
+                sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
+                server_1.conn.getConnector().query(sql, [[[created_at, lat, long, city, state, country, country_code, location, location_hash]]], (err, result_geos) => {
+                    if (err) {
+                        return res.status(400).json({
+                            message: "Error when saving living location: " + err
+                        });
+                    }
+                    console.log("Insert into geo successfully");
+                    geo_id = result_geos.insertId;
+                });
+            }
+            sql = "INSERT INTO album (created_at, description, geo_id, tag_id, user_id, dream_real, image) VALUES ?";
+            server_1.conn.getConnector().query(sql, [[[created_at, description, geo_id, tag_id, user_id, dream_real, image_uri]]], function (err, result) {
                 if (err) {
-                    return res.status(400).json({
-                        message: "Error when collecting existing geo id: " + err
+                    return res.status(400),json({
+                        message: "Error when adding new album: " + err.message
                     });
                 }
                 else {
-                    var geo_id = null;
-                    if (JSON.parse(JSON.stringify(geo_rows))[0] != undefined) {
-                        geo_id = JSON.parse(JSON.stringify(geo_rows))[0].id;
-                    }
-                    else {
-                        var sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
-                        connection.query(sql, [[[created_at, lat, long, city, state, country, country_code, location, location_hash]]], (err, result_geos) => {
-                            if (err) {
-                                return res.status(400).json({
-                                    message: "Error when saving living location: " + err
-                                });
-                            }
-                            console.log("Insert into geo successfully");
-                            geo_id = result_geos.insertId;
-                        });
-                    }
-                    var sql = "INSERT INTO album (created_at, description, geo_id, tag_id, user_id, dream_real, image) VALUES ?";
-                    connection.query(sql, [[[created_at, description, geo_id, tag_id, user_id, dream_real, image_uri]]], function (err, result) {
-                        if (err) {
-                            return console.error(err.message);
-                        }
-                        else {
-                            return next();
-                        }
-                    });
+                    return next();
                 }
             });
         }
-        connection.release();
     });
 });
 exports.default = createAlbum;
