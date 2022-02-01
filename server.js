@@ -60,7 +60,7 @@ app.get("/logout", main_controller_1.default.authorization, (req, res) => {
         .status(200)
         .json({ message: "Successfully logged out 😏 🍀" });
 });
-app.get("/album_trending", [main_controller_1.default.authorization, main_controller_1.default.getAlbumTrending], (req, res) => {
+app.get("/album_trending", main_controller_1.default.getAlbumTrending, (req, res) => {
     return res.status(200).json(req.album);
 });
 app.get("/album_user", [main_controller_1.default.authorization, main_controller_1.default.getAlbumUser], (req, res) => {
