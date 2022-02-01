@@ -17,8 +17,33 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const main_controller_1 = __importDefault(require("./api/controller/main_controller"));
+const aws_sdk_1 = __importDefault(require("aws-sdk"));
+const multerS3 = require('multer-s3')
+const multer = require('multer')
+
 dotenv.config();
 exports.conn = new connector_1.default();
+
+const s3 = new aws_sdk_1.default.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET
+});
+
+exports.s3 = s3.default();
+
+const upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: process.env.AWS_BUCKET_NAME,
+        acl: 'public-read',
+        key: function(req, file, cb) {
+            let extArray = file.mimetype.split("/");
+            let extension = extArray[extArray.length - 1];
+            cb(null, "/" + file.fieldname + "/" + file.filename + "." + extension)
+        }
+    })
+});
+
 const app = express_1.default();
 app.use(cookie_parser_1.default());
 app.use(body_parser_1.default.json());
@@ -39,7 +64,7 @@ app.post("/email_validity", main_controller_1.default.check_email_validity, (req
         message: "Email is available to use"
     });
 });
-app.post("/register", [main_controller_1.default.check_usn_validity, main_controller_1.default.check_email_validity, main_controller_1.default.register], (req, res) => {
+app.post("/register", [main_controller_1.default.check_usn_validity, main_controller_1.default.check_email_validity, upload.fields([{name: "avatar", maxCount: 1}, {name: "cover", maxCount: 1}]),main_controller_1.default.register], (req, res) => {
     return res.status(200).json({
         message: "New user signed up successfully"
     });

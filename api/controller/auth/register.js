@@ -21,20 +21,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const server_1 = require("../../../server");
-const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const dotenv = __importStar(require("dotenv"));
-const file_type_1 = import("file-type");
 const crypto = __importStar(require("crypto"));
 const moment_1 = __importDefault(require("moment"));
+
 dotenv.config();
-const s3 = new aws_sdk_1.default.S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET
-});
+
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     // Local variables
-    let avatar_uri = null; // avatar (user)
-    let cover_uri = null; // cover (user)
+    let avatar_uri = ""; // avatar (user)
+    let cover_uri = ""; // cover (user)
     let lat = "";
     let long = "";
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
@@ -46,64 +42,25 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     let username = req_body.username;
     let hashed_email = crypto.createHash('md5').update(email).digest('base64'); // username (user)
     let password = crypto.pbkdf2Sync(req_body.password, hashed_email, 1000, 64, "sha512").toString("base64");
-    if (req_body.avatar != undefined) {
-        let avatar = Buffer.from(req_body.avatar, "utf-8");
-        // Upload avatar to AWS S3 Storage
-        let avatar_img_type = yield file_type_1.fileTypeFromBuffer(avatar);
-        if (avatar_img_type == undefined) {
-            return res.status(400).json({
-                message: "Error when uploading avatar: Unable to detect extension of uploaded avatar"
-            });
-        }
-        const params = {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: "/avatar/" + username + "." + avatar_img_type.ext,
-            Body: avatar
-        };
-        s3.upload(params, (err, data) => {
-            if (err) {
-                return res.status(400).json({
-                    message: "Error when uploading avatar: " + err.message
-                });
-            }
-            else {
-                avatar_uri = data.Location.replace(process.env.S3_URL, "");
-            }
-        });
+    if (req.files["avatar"][0] != undefined) {
+        let extArray = req.files["avatar"][0].mimetype.split("/");
+        let extension = extArray[extArray.length - 1];
+        avatar_uri = "/avatar/" + req.files["avatar"][0].filename + "." + extension
     }
     else {
         avatar_uri = "/letter-avatar/" + last_name[0].toUpperCase() + ".png";
     }
-    if (req_body.cover != undefined) {
-        let cover = Buffer.from(req_body.cover, "utf-8");
-        // Upload cover to AWS S3 Storage
-        let cover_img_type = yield file_type_1.fileTypeFromBuffer(cover);
-        if (cover_img_type == undefined) {
-            return res.status(400).json({
-                message: "Error when uploading cover: Unable to detect extension of uploaded cover"
-            });
-        }
-        const params_cover = {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: "/cover/" + username + "." + cover_img_type.ext,
-            Body: cover
-        };
-        s3.upload(params_cover, (err, data) => {
-            if (err) {
-                return res.status(400).json({
-                    message: "Error when uploading cover: " + err.message
-                });
-            }
-            else {
-                cover_uri = data.Location;
-            }
-        });
+    
+    if (req.files["cover"][0] != undefined) {
+        let extArray = req.files["cover"][0].mimetype.split("/");
+        let extension = extArray[extArray.length - 1];
+        avatar_uri = "/cover/" + req.files["cover"][0].filename + "." + extension
     }
     else {
         cover_uri = "/cover/default.jpg";
     }
     // Create empty folder for user's album
-    s3.putObject({
+    server_1.s3.putObject({
         ACL: "public-read-write",
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: "/album/" + username + "/"
