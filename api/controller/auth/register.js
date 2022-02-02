@@ -102,7 +102,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         });
 
         // Get latitude & longitude
-        axios.get(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json`, {
+        axios.get('https://maps.googleapis.com/maps/api/place/findplacefromtext/json', {
             params: {
                 fields: "geometry",
                 input: location,
