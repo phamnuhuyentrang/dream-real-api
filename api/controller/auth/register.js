@@ -42,28 +42,28 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     let username = req_body.username;
     let hashed_email = crypto.createHash('md5').update(email).digest('base64'); // username (user)
     let password = crypto.pbkdf2Sync(req_body.password, hashed_email, 1000, 64, "sha512").toString("base64");
-    if (req.files["avatar"][0] != undefined) {
+    if (req.files["avatar"] != undefined) {
         let extArray = req.files["avatar"][0].mimetype.split("/");
         let extension = extArray[extArray.length - 1];
-        avatar_uri = "/avatar/" + req.files["avatar"][0].filename + "." + extension
+        avatar_uri = "avatar/" + username + "." + extension
     }
     else {
-        avatar_uri = "/letter-avatar/" + last_name[0].toUpperCase() + ".png";
+        avatar_uri = "letter-avatar/" + last_name[0].toUpperCase() + ".png";
     }
     
-    if (req.files["cover"][0] != undefined) {
+    if (req.files["cover"] != undefined) {
         let extArray = req.files["cover"][0].mimetype.split("/");
         let extension = extArray[extArray.length - 1];
-        avatar_uri = "/cover/" + req.files["cover"][0].filename + "." + extension
+        avatar_uri = "cover/" + username + "." + extension
     }
     else {
-        cover_uri = "/cover/default.jpg";
+        cover_uri = "cover/default.jpg";
     }
     // Create empty folder for user's album
     server_1.s3.putObject({
         ACL: "public-read-write",
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: "/album/" + username + "/"
+        Key: "album/" + username + "/"
     }, function (err, data) {
         if (err) {
             return res.status(400).json({
@@ -82,35 +82,51 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             state = lives[lives.length - 2];
         }
         let country_code = ""; // location_country_iso (geo)
-        let fetch_country = yield axios_1.default.get("https://restcountries.com/v3.1/name/" + country);
-        let fetch_res = JSON.parse(JSON.stringify(fetch_country.data));
-        if (!Array.isArray(fetch_res)) {
+        axios.get("https://restcountries.com/v3.1/name/" + country)
+        .then(fetch_country => {
+            console.log(fetch_country)
+            let fetch_res = JSON.parse(JSON.stringify(fetch_country.data));
+            if (!Array.isArray(fetch_res)) {
+                return res.status(400).json({
+                    message: "Error when finding living country ISO code: " + fetch_res.message
+                });
+            }
+            else {
+                country_code = fetch_res[0].cca3;
+            }
+        })
+        .catch( error => {
             return res.status(400).json({
-                message: "Error when finding living country ISO code: " + fetch_res.message
-            });
-        }
-        else {
-            country_code = fetch_res[0].cca3;
-        }
+                message: "Error when finding country ISO code: " + error
+            })
+        });
+
         // Get latitude & longitude
-        let result = yield axios_1.default.get(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json`, {
+        axios.get(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json`, {
             params: {
                 fields: "geometry",
-                input: info_lives,
+                input: location,
                 inputtype: "textquery",
                 key: process.env.MAPS_KEY
             }
-        });
-        let data = JSON.parse(JSON.stringify(result.data));
-        if (data.status != "OK") {
+        })
+        .then(result => {
+            let data = JSON.parse(JSON.stringify(result.data));
+            if (data.status != "OK") {
+                return res.status(400).json({
+                    message: "Error when finding living location coordinates: " + data.error_message
+                });
+            }
+            else {
+                lat = data.candidates[0].geometry.location.lat;
+                long = data.candidates[0].geometry.location.lng;
+            }
+        })
+        .catch( error => {
             return res.status(400).json({
-                message: "Error when finding living location coordinate: " + data.error_message
-            });
-        }
-        else {
-            lat = data.candidates[0].geometry.location.lat;
-            long = data.candidates[0].geometry.location.lng;
-        }
+                message: "Error when finding location coordinates: " + error
+            })
+        });
         // Add to database
         var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
         server_1.conn.getConnector().query(sql, [info_lives], (err, geo_rows) => {

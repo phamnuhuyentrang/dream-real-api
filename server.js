@@ -29,7 +29,7 @@ const s3 = new aws_sdk_1.default.S3({
     secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET
 });
 
-exports.s3 = s3.default();
+exports.s3 = s3;
 
 const upload = multer({
     storage: multerS3({
@@ -37,12 +37,23 @@ const upload = multer({
         bucket: process.env.AWS_BUCKET_NAME,
         acl: 'public-read',
         key: function(req, file, cb) {
-            let extArray = file.mimetype.split("/");
-            let extension = extArray[extArray.length - 1];
-            cb(null, "/" + file.fieldname + "/" + file.filename + "." + extension)
+            cb(null, file.fieldname + "/" + req.body.username + "." + extension)
         }
     })
 });
+
+const uploadAlbum = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: process.env.AWS_BUCKET_NAME,
+        acl: 'public-read',
+        key: function(req, file, cb) {
+            let extArray = file.mimetype.split("/");
+            let extension = extArray[extArray.length - 1];
+            cb(null, "album/" + req.body.username + "/" + file.originalname)
+        }
+    })
+})
 
 const app = express_1.default();
 app.use(cookie_parser_1.default());
@@ -85,6 +96,11 @@ app.get("/logout", main_controller_1.default.authorization, (req, res) => {
         .status(200)
         .json({ message: "Successfully logged out 😏 🍀" });
 });
+app.post("/new_album", [uploadAlbum.single("image"), main_controller_1.default.createAlbum], (req, res) => {
+    return res.status(200).json({
+        message: "Your album is added sucessfully"
+    });
+})
 app.get("/album_trending", main_controller_1.default.getAlbumTrending, (req, res) => {
     return res.status(200).json(req.album);
 });
