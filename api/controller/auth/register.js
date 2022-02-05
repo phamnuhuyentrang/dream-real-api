@@ -28,6 +28,7 @@ const moment_1 = __importDefault(require("moment"));
 dotenv.config();
 
 const register = async(req, res, next) => {
+    console.log("Register")
     // Local variables
     let avatar_uri = ""; // avatar (user)
     let cover_uri = ""; // cover (user)
@@ -55,7 +56,7 @@ const register = async(req, res, next) => {
     if (req.files["cover"] != undefined) {
         let extArray = req.files["cover"][0].mimetype.split("/");
         let extension = extArray[extArray.length - 1];
-        avatar_uri = "cover/" + username + "." + extension
+        cover_uri = "cover/" + username + "." + extension
     }
     else {
         cover_uri = "cover/default.jpg";

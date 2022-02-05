@@ -81,7 +81,7 @@ app.post("/email_validity", main_controller_1.default.check_email_validity, (req
         message: "Email is available to use"
     });
 });
-app.post("/register", [main_controller_1.default.check_usn_validity, main_controller_1.default.check_email_validity, upload.fields([{name: "avatar", maxCount: 1}, {name: "cover", maxCount: 1}]),main_controller_1.default.register], (req, res) => {
+app.post("/register", [upload.fields([{name: "avatar", maxCount: 1}, {name: "cover", maxCount: 1}]),main_controller_1.default.register], (req, res) => {
     return res.status(200).json({
         success: true,
         message: "New user signed up successfully"
@@ -95,7 +95,7 @@ app.post("/login", main_controller_1.default.login, (req, res) => {
         secure: process.env.NODE_ENV === "production",
     })
         .status(200)
-        .json({ success: true, id: req.id, message: "Logged in successfully 😊 👌" });
+        .json({ success: true, id: req.id, first_name: req.firstname, last_name: req.lastname, avatar: req.avatar, message: "Logged in successfully 😊 👌" });
 });
 app.get("/logout", main_controller_1.default.authorization, (req, res) => {
     return res
@@ -110,16 +110,16 @@ app.post("/new_album", [uploadAlbum.single("image"), main_controller_1.default.c
     });
 })
 app.get("/album_trending", main_controller_1.default.getAlbumTrending, (req, res) => {
-    return res.status(200).json({success: true, ...req.album});
+    return res.status(200).json({success: true, albums: req.album});
 });
 app.get("/album_user", [main_controller_1.default.authorization, main_controller_1.default.getAlbumUser], (req, res) => {
-    return res.status(200).json({success: true, ...req.album});
+    return res.status(200).json({success: true, albums: req.album});
 });
 app.get("/album_favorite", [main_controller_1.default.authorization, main_controller_1.default.getAlbumFavorite], (req, res) => {
-    return res.status(200).json({success: true, ...req.album});
+    return res.status(200).json({success: true, albums: req.album});
 });
 app.get("/get_comment", [main_controller_1.default.authorization, main_controller_1.default.getComment], (req, res) => {
-    return res.status(200).json({success: true, ...req.comment});
+    return res.status(200).json({success: true, comments: req.comment});
 });
 app.post("/add_comment", [main_controller_1.default.authorization, main_controller_1.default.addComment], (req, res) => {
     return res.status(200).json({
@@ -128,7 +128,7 @@ app.post("/add_comment", [main_controller_1.default.authorization, main_controll
     });
 });
 app.get("/get_reply", [main_controller_1.default.authorization, main_controller_1.default.getReply], (req, res) => {
-    return res.status(200).json({success: true, ...req.comment});
+    return res.status(200).json({success: true, comments: req.comment});
 });
 app.post("/reply_to", [main_controller_1.default.authorization, main_controller_1.default.replyTo], (req, res) => {
     return res.status(200).json({
@@ -149,11 +149,11 @@ app.post("/react_comment", [main_controller_1.default.ReactComment], (req, res) 
     });
 });
 app.get("/get_followers", [main_controller_1.default.authorization, main_controller_1.default.getFollower], (req, res) => {
-    return res.status(200).json({success: true, ...req.follower});
+    return res.status(200).json({success: true, followers: req.follower});
 
 });
 app.get("/get_following", [main_controller_1.default.authorization, main_controller_1.default.getFollowing], (req, res) => {
-    return res.status(200).json({success: true, ...req.following});
+    return res.status(200).json({success: true, following: req.following});
 });
 app.post("/follow", main_controller_1.default.Follow, (req, res) => {
     return res.status(200).json({
@@ -168,7 +168,7 @@ app.post("/unfollow", main_controller_1.default.unFollow, (req, res) => {
     });
 });
 app.get("/get_connection", [main_controller_1.default.authorization, main_controller_1.default.getConnection], (req, res) => {
-    return res.status(200).json({success: true, ...req.friend});
+    return res.status(200).json({success: true, friends: req.friend});
 });
 app.post("/send_friend_request", main_controller_1.default.sendRequestFriend, (req, res) => {
     return res.status(200).json({
@@ -183,7 +183,7 @@ app.post("/answer_friend_request", main_controller_1.default.answerRequestFriend
     });
 });
 app.get("/get_friends", [main_controller_1.default.authorization, main_controller_1.default.getFriends], (req, res) => {
-    return res.status(200).json({success: true, ...req.friend});
+    return res.status(200).json({success: true, friends: req.friend});
 });
 app.post("/unfriend", main_controller_1.default.unFriend, (req, res) => {
     return res.status(200).json({
@@ -193,9 +193,10 @@ app.post("/unfriend", main_controller_1.default.unFriend, (req, res) => {
 });
 const start = () => {
     let port = process.env.PORT;
+    let host = process.env.HOST;
     try {
-        app.listen(port, "192.168.1.25", () => {
-            console.log(`Api up and running at: http://localhost:${port}`);
+        app.listen(port, host, () => {
+            console.log(`Api up and running at: http://${host}:${port}`);
         });
     }
     catch (error) {

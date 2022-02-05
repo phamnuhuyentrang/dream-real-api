@@ -11,9 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("../../../server");
 const check_email_validity = (req, res, next) =>  {
-    console.log("Check email avalability")
     let req_body = req.body;
     let email = req_body.email;
+    console.log("Check email avalability: " + email)
     // Check if username is already in use
     var sql = "SELECT email FROM user WHERE email = ?";
     server_1.conn.getConnector().query(sql, [email], (err, email_res) => {
