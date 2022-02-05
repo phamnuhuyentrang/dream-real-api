@@ -10,22 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("../../../server");
-const check_usn_validity = async (req, res, next) => {
+const check_usn_validity = (req, res, next) => {
     console.log("Check username validity")
     let req_body = req.body;
     let username = req_body.username;
     // Check if username is already in use
     var sql = "SELECT username FROM user WHERE username = ?";
-    await server_1.conn.getConnector().query(sql, [username], (err, usn_res) => {
+    server_1.conn.getConnector().query(sql, [username], (err, usn_res) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when verifying username: " + err
             });
         }
         else {
-            if (JSON.parse(JSON.stringify(usn_res))[0]) {
+            if (JSON.parse(JSON.stringify(usn_res))[0] != undefined) {
                 console.log("Username has already been used")
-                return res.status(400).json({
+                return res.status(200).json({
+                    success: false,
                     message: "Username has already been used"
                 });
             }

@@ -17,7 +17,8 @@ const sendRequestFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     var sql = "INSERT INTO friend (user_id, friend_id) VALUES ?";
     server_1.conn.getConnector().query(sql, [[[user_id, friend_id]]], (err, rows) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when send request friend: " + err
             });
         }

@@ -16,7 +16,8 @@ const answerRequestFriend = (req, res, next) => __awaiter(void 0, void 0, void 0
     let friend_id = req_body.friend_id;
     let action = req_body.action;
     if (action != "accept" && action != "decline") {
-        return res.status(400).json({
+        return res.status(200).json({
+            success: false,
             message: "Error when answering friend request: Action invalid"
         });
     }
@@ -29,7 +30,8 @@ const answerRequestFriend = (req, res, next) => __awaiter(void 0, void 0, void 0
     }
     server_1.conn.getConnector().query(sql, [user_id, friend_id, friend_id, user_id], (err, rows) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when answer request friend: " + err
             });
         }

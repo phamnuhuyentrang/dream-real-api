@@ -17,7 +17,8 @@ const unFriend = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     var sql = "DELETE FROM friend WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
     server_1.conn.getConnector().query(sql, [user_id, friend_id, friend_id, user_id], (err, rows) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when decline request friend: " + err
             });
         }

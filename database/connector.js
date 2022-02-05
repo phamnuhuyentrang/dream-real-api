@@ -12,6 +12,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mysql2_1 = __importDefault(require("mysql2"));
 const dotenv = __importStar(require("dotenv"));
+const util = require('util')
+
 class Connector {
     constructor() {
         dotenv.config();
@@ -24,6 +26,7 @@ class Connector {
             multipleStatements: true
         });
         this.checkConnection();
+        this.db.query = util.promisify(this.db.query)
     }
     checkConnection() {
         this.db.getConnection((error) => {

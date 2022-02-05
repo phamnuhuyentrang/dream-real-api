@@ -67,7 +67,8 @@ const register = async(req, res, next) => {
         Key: "album/" + username + "/"
     }, function (err, data) {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when creating repository for album: " + err.message
             });
         }
@@ -90,7 +91,8 @@ const register = async(req, res, next) => {
         try {
             let fetch_res = JSON.parse(JSON.stringify(await fetch_country.json()));
             if (!Array.isArray(fetch_res)) {
-                return res.status(400).json({
+                return res.status(200).json({
+                    success: false,
                     message: "Error when finding living country ISO code: " + fetch_res.message
                 });
             }
@@ -99,7 +101,8 @@ const register = async(req, res, next) => {
             }
         }
         catch(error) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when finding country ISO code: " + error
             })
         }
@@ -116,7 +119,8 @@ const register = async(req, res, next) => {
             console.log(long)
         }
         catch(error) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when finding location coordinates: " + error
             })
         }
@@ -124,7 +128,8 @@ const register = async(req, res, next) => {
         var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
         server_1.conn.getConnector().query(sql, [info_lives], (err, geo_rows) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(200).json({
+                    success: false,
                     message: "Error when verifying live location: " + err
                 });
             }
@@ -137,7 +142,8 @@ const register = async(req, res, next) => {
                     var sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
                     server_1.conn.getConnector().query(sql, [[[created_at, lat, long, city, state, country, country_code, info_lives, location_hash]]], (err, result_geos) => {
                         if (err) {
-                            return res.status(400).json({
+                            return res.status(200).json({
+                                success: false,
                                 message: "Error when saving living location: " + err
                             });
                         }
@@ -149,7 +155,8 @@ const register = async(req, res, next) => {
                 var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at, geo_id) VALUES ?";
                 server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at, geo_id]]], function (err, result) {
                     if (err) {
-                        return res.status(400).json({
+                        return res.status(200).json({
+                            success: false,
                             message: "Error when creating new user: " + err
                         });
                     }
@@ -164,7 +171,8 @@ const register = async(req, res, next) => {
         var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at) VALUES ?";
         server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at]]], function (err, result) {
             if (err) {
-                return res.status(400).json({
+                return res.status(200).json({
+                    success: false,
                     message: "Error when creating new user: " + err
                 });
             }

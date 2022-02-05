@@ -25,12 +25,13 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     let password = crypto.pbkdf2Sync(req_body.password, hashed_email, 1000, 64, "sha512").toString("base64");
     server_1.conn.getConnector().query("SELECT id, username, role FROM user WHERE email = ? AND password = ?", [email, password], function (err, result) {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error to connect database: " + err
             });
         }
         else {
-            if (!JSON.parse(JSON.stringify(result))[0] != undefined) {
+            if (JSON.parse(JSON.stringify(result))[0] != undefined) {
                 let data = JSON.parse(JSON.stringify(result))[0];
                 req.username = data.username;
                 req.role = data.role;
@@ -38,7 +39,8 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
                 return next();
             }
             else {
-                return res.status(400).json({
+                return res.status(200).json({
+                    success: false,
                     message: "Email/password is not correct"
                 });
             }

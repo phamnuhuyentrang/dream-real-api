@@ -23,7 +23,10 @@ const replyTo = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     var sql = "INSERT INTO comment(created_at, user_id, context, reply_to) VALUES ?";
     server_1.conn.getConnector().query(sql, [[[created_at, user_id, context, comment_id]]], (err, rows) => {
         if (err) {
-            return res.status(400).send("Error when adding a reply to comment: " + err);
+            return res.status(200).json({
+                success: false,
+                message: "Error when adding a reply to comment: " + err
+            });
         }
         else {
             return next();

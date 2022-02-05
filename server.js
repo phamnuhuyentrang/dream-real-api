@@ -21,6 +21,7 @@ const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const multerS3 = require('multer-s3')
 const multer = require('multer')
 
+
 dotenv.config();
 exports.conn = new connector_1.default();
 
@@ -63,22 +64,26 @@ app.use(body_parser_1.default.json());
 
 app.get("/", (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "Welcome to API Dream Real"
     });
 })
 
-// app.post("/usn_validity", main_controller_1.default.check_usn_validity, (req, res) => {
-//     return res.status(200).json({
-//         message: "Username is available to use"
-//     });
-// });
-// app.post("/email_validity", main_controller_1.default.check_email_validity, (req, res) => {
-//     return res.status(200).json({
-//         message: "Email is available to use"
-//     });
-// });
+app.post("/usn_validity", main_controller_1.default.check_usn_validity, (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "Username is available to use"
+    });
+});
+app.post("/email_validity", main_controller_1.default.check_email_validity, (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "Email is available to use"
+    });
+});
 app.post("/register", [main_controller_1.default.check_usn_validity, main_controller_1.default.check_email_validity, upload.fields([{name: "avatar", maxCount: 1}, {name: "cover", maxCount: 1}]),main_controller_1.default.register], (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "New user signed up successfully"
     });
 });
@@ -90,88 +95,99 @@ app.post("/login", main_controller_1.default.login, (req, res) => {
         secure: process.env.NODE_ENV === "production",
     })
         .status(200)
-        .json({ id: req.id, message: "Logged in successfully 😊 👌" });
+        .json({ success: true, id: req.id, message: "Logged in successfully 😊 👌" });
 });
 app.get("/logout", main_controller_1.default.authorization, (req, res) => {
     return res
         .clearCookie("access_token")
         .status(200)
-        .json({ message: "Successfully logged out 😏 🍀" });
+        .json({ success: true, message: "Successfully logged out 😏 🍀" });
 });
 app.post("/new_album", [uploadAlbum.single("image"), main_controller_1.default.createAlbum], (req, res) => {
     return res.status(200).json({
-        message: "Your album is added sucessfully"
+        success: true,
+        message: "Your album is added successfully"
     });
 })
 app.get("/album_trending", main_controller_1.default.getAlbumTrending, (req, res) => {
-    return res.status(200).json(req.album);
+    return res.status(200).json({success: true, ...req.album});
 });
 app.get("/album_user", [main_controller_1.default.authorization, main_controller_1.default.getAlbumUser], (req, res) => {
-    return res.status(200).json(req.album);
+    return res.status(200).json({success: true, ...req.album});
 });
 app.get("/album_favorite", [main_controller_1.default.authorization, main_controller_1.default.getAlbumFavorite], (req, res) => {
-    return res.status(200).json(req.album);
+    return res.status(200).json({success: true, ...req.album});
 });
 app.get("/get_comment", [main_controller_1.default.authorization, main_controller_1.default.getComment], (req, res) => {
-    return res.status(200).json(req.comment);
+    return res.status(200).json({success: true, ...req.comment});
 });
 app.post("/add_comment", [main_controller_1.default.authorization, main_controller_1.default.addComment], (req, res) => {
     return res.status(200).json({
-        message: "Your comment is added sucessfully"
+        success: true,
+        message: "Your comment is added successfully"
     });
 });
 app.get("/get_reply", [main_controller_1.default.authorization, main_controller_1.default.getReply], (req, res) => {
-    return res.status(200).json(req.comment);
+    return res.status(200).json({success: true, ...req.comment});
 });
 app.post("/reply_to", [main_controller_1.default.authorization, main_controller_1.default.replyTo], (req, res) => {
     return res.status(200).json({
-        message: "Your reply is added sucessfully"
+        success: true,
+        message: "Your reply is added successfully"
     });
 });
 app.post("/react_album", [main_controller_1.default.ReactAlbum], (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "You have reacted to an album"
     });
 });
 app.post("/react_comment", [main_controller_1.default.ReactComment], (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "You have reacted to a comment"
     });
 });
 app.get("/get_followers", [main_controller_1.default.authorization, main_controller_1.default.getFollower], (req, res) => {
-    return res.status(200).json(req.follower);
+    return res.status(200).json({success: true, ...req.follower});
+
 });
 app.get("/get_following", [main_controller_1.default.authorization, main_controller_1.default.getFollowing], (req, res) => {
-    return res.status(200).json(req.following);
+    return res.status(200).json({success: true, ...req.following});
 });
 app.post("/follow", main_controller_1.default.Follow, (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "You have followed a person"
     });
 });
 app.post("/unfollow", main_controller_1.default.unFollow, (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "You have unfollowed a person"
     });
 });
 app.get("/get_connection", [main_controller_1.default.authorization, main_controller_1.default.getConnection], (req, res) => {
-    return res.status(200).json(req.friend);
+    return res.status(200).json({success: true, ...req.friend});
 });
 app.post("/send_friend_request", main_controller_1.default.sendRequestFriend, (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "You have sent a friend request to a person"
     });
 });
 app.post("/answer_friend_request", main_controller_1.default.answerRequestFriend, (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "You have answered a friend request"
     });
 });
 app.get("/get_friends", [main_controller_1.default.authorization, main_controller_1.default.getFriends], (req, res) => {
-    return res.status(200).json(req.friend);
+    return res.status(200).json({success: true, ...req.friend});
 });
 app.post("/unfriend", main_controller_1.default.unFriend, (req, res) => {
     return res.status(200).json({
+        success: true,
         message: "You have unfriended a person"
     });
 });

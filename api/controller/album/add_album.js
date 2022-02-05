@@ -58,7 +58,8 @@ const createAlbum = async (req, res, next) => {
     try {
         let fetch_res = JSON.parse(JSON.stringify(await fetch_country.json()));
         if (!Array.isArray(fetch_res)) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when finding living country ISO code: " + fetch_res.message
             });
         }
@@ -67,7 +68,8 @@ const createAlbum = async (req, res, next) => {
         }
     }
     catch(error) {
-        return res.status(400).json({
+        return res.status(200).json({
+            success: false,
             message: "Error when finding country ISO code: " + error
         })
     }
@@ -85,7 +87,8 @@ const createAlbum = async (req, res, next) => {
         console.log(long)
     }
     catch(error) {
-        return res.status(400).json({
+        return res.status(200).json({
+            success: false,
             message: "Error when finding location coordinates: " + error
         })
     }
@@ -94,7 +97,8 @@ const createAlbum = async (req, res, next) => {
     var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
     server_1.conn.getConnector().query(sql, [location], (err, geo_rows) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when collecting existing geo id: " + err
             });
         }
@@ -107,7 +111,8 @@ const createAlbum = async (req, res, next) => {
                 sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
                 server_1.conn.getConnector().query(sql, [[[created_at, lat, long, city, state, country, country_code, location, location_hash]]], (err, result_geos) => {
                     if (err) {
-                        return res.status(400).json({
+                        return res.status(200).json({
+                            success: false,
                             message: "Error when saving living location: " + err
                         });
                     }
@@ -118,7 +123,8 @@ const createAlbum = async (req, res, next) => {
             sql = "INSERT INTO album (created_at, description, geo_id, tag_id, user_id, dream_real, image) VALUES ?";
             server_1.conn.getConnector().query(sql, [[[created_at, description, geo_id, tag_id, user_id, dream_real, image_uri]]], function (err, result) {
                 if (err) {
-                    return res.status(400).json({
+                    return res.status(200).json({
+                        success: false,
                         message: "Error when adding new album: " + err.message
                     });
                 }

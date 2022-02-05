@@ -17,7 +17,8 @@ const getFollowing = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     var sql = "SELECT u.id as user_id, u.first_name, u.last_name, u.avatar FROM follow f JOIN user u ON f.following_id = u.id WHERE f.follower_id = ? LIMIT 10 OFFSET " + offset;
     server_1.conn.getConnector().query(sql, [user_id], (err, rows) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when getting following: " + err
             });
         }

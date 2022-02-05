@@ -17,7 +17,8 @@ const unFollow = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     var sql = "DELETE FROM follow WHERE following_id = ? AND follower_id = ?";
     server_1.conn.getConnector().query(sql, [user_follow_id, user_id], (err, rows) => {
         if (err) {
-            return res.status(400).json({
+            return res.status(200).json({
+                success: false,
                 message: "Error when insert follow: " + err
             });
         }
