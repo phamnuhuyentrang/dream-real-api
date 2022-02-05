@@ -10,12 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("../../../server");
-const check_email_validity = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    let req_body = yield req.body;
+const check_email_validity = async (req, res, next) =>  {
+    console.log("Check email avalability")
+    let req_body = req.body;
     let email = req_body.email;
     // Check if username is already in use
     var sql = "SELECT email FROM user WHERE email = ?";
-    server_1.conn.getConnector().query(sql, [email], (err, email_res) => {
+    await server_1.conn.getConnector().query(sql, [email], (err, email_res) => {
         if (err) {
             return res.status(400).json({
                 message: "Error when verifying email: " + err
@@ -23,12 +24,15 @@ const check_email_validity = (req, res, next) => __awaiter(void 0, void 0, void 
         }
         else {
             if (JSON.parse(JSON.stringify(email_res))[0] != undefined) {
+                console.log("Email has already been used")
                 return res.status(400).json({
                     message: "Email has already been used"
                 });
             }
-            return next();
+            else {
+                return next();
+            }
         }
     });
-});
+}
 exports.default = check_email_validity;

@@ -23,15 +23,16 @@ const axios = require("axios");
 const server_1 = require("../../../server");
 const dotenv = __importStar(require("dotenv"));
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
-const file_type_1 = import("file-type");
 const moment_1 = __importDefault(require("moment"));
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 dotenv.config();
 const s3 = new aws_sdk_1.default.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET
 });
-const createAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    let req_body = yield req.body;
+const createAlbum = async (req, res, next) => {
+    let req_body = req.body;
     let location = req_body.location; // location_formatted (geo)
     let location_hash = req_body.location_hash; // location_hash (geo)
     let dream_real = req_body.dream_real;
@@ -51,10 +52,11 @@ const createAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         state = lives[lives.length - 2];
     }
     let country_code = ""; // location_country_iso (geo)
-    axios.get("https://restcountries.com/v3.1/name/" + country)
-    .then(fetch_country => {
-        console.log(fetch_country)
-        let fetch_res = JSON.parse(JSON.stringify(fetch_country.data));
+    const fetch_country = await fetch("https://restcountries.com/v3.1/name/" + country, {
+        "method": "GET"
+    })
+    try {
+        let fetch_res = JSON.parse(JSON.stringify(await fetch_country.json()));
         if (!Array.isArray(fetch_res)) {
             return res.status(400).json({
                 message: "Error when finding living country ISO code: " + fetch_res.message
@@ -63,40 +65,30 @@ const createAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         else {
             country_code = fetch_res[0].cca3;
         }
-    })
-    .catch( error => {
+    }
+    catch(error) {
         return res.status(400).json({
             message: "Error when finding country ISO code: " + error
         })
-    });
+    }
     
     
     // Get location hash
-    axios.get(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json`, {
-        params: {
-            fields: "geometry",
-            input: location,
-            inputtype: "textquery",
-            key: process.env.MAPS_KEY
-        }
+    const result = await fetch("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=geometry&input=" + info_lives + "&inputtype=textquery&key=" + process.env.MAPS_KEY, {
+        "method": "GET"
     })
-    .then(result => {
-        let data = JSON.parse(JSON.stringify(result.data));
-        if (data.status != "OK") {
-            return res.status(400).json({
-                message: "Error when finding living location coordinates: " + data.error_message
-            });
-        }
-        else {
-            lat = data.candidates[0].geometry.location.lat;
-            long = data.candidates[0].geometry.location.lng;
-        }
-    })
-    .catch( error => {
+    try {
+        let data = JSON.parse(JSON.stringify(await result.json()));
+        lat = data.candidates[0].geometry.location.lat;
+        long = data.candidates[0].geometry.location.lng;
+        console.log(lat)
+        console.log(long)
+    }
+    catch(error) {
         return res.status(400).json({
             message: "Error when finding location coordinates: " + error
         })
-    });
+    }
 
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
     var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
@@ -136,5 +128,5 @@ const createAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             });
         }
     });
-});
+}
 exports.default = createAlbum;

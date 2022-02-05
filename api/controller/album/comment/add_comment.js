@@ -23,9 +23,7 @@ const addComment = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     var sql = "INSERT INTO comment (user_id, album_id, created_at, context) VALUES ?";
     server_1.conn.getConnector().query(sql, [[[user_id, album_id, created_at, context]]], (err, rows) => {
         if (err) {
-            return res.status(400).json({
-                message: "Error when verifying live location: " + err.message
-            });
+            return res.status(400).send("Error when verifying live location: " + err.message);
         }
         else {
             return next();

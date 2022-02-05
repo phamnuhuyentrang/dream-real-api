@@ -28,7 +28,7 @@ class Connector {
     checkConnection() {
         this.db.getConnection((error) => {
             if (error) {
-                console.log(JSON.stringify(error));
+                console.log("Error connect db: " + JSON.stringify(error));
             }
             else {
                 console.log('Connected!');

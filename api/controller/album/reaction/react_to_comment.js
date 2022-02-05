@@ -26,9 +26,7 @@ const ReactComment = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         var sql = "INSERT INTO react(created_at, user_id, comment_id, emoji) VALUES ?";
         server_1.conn.getConnector().query(sql, [[[created_at, user_id, comment_id, emoji]]], (err, rows) => {
             if (err) {
-                return res.status(400).json({
-                    message: "Error when add reaction: " + err
-                });
+                return res.status(400).send("Error when add reaction: " + err);
             }
             else {
                 return next();
@@ -39,9 +37,7 @@ const ReactComment = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         var sql = "UPDATE react SET updated_at = ?, emoji = ? WHERE user_id = ? AND comment_id = ?";
         server_1.conn.getConnector().query(sql, [created_at, emoji, user_id, comment_id], (err, rows) => {
             if (err) {
-                return res.status(400).json({
-                    message: "Error when change reaction: " + err
-                });
+                return res.status(400).send("Error when change reaction: " + err);
             }
             else {
                 return next();
@@ -52,9 +48,7 @@ const ReactComment = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         var sql = "DELETE FROM react WHERE user_id = ? AND comment_id = ?";
         server_1.conn.getConnector().query(sql, [user_id, comment_id], (err, rows) => {
             if (err) {
-                return res.status(400).json({
-                    message: "Error when remove reaction: " + err
-                });
+                return res.status(400).send("Error when remove reaction: " + err);
             }
             else {
                 return next();
@@ -62,9 +56,7 @@ const ReactComment = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         });
     }
     else {
-        return res.status(400).json({
-            message: "Error when reacting to comment: Invalid action"
-        });
+        return res.status(400).json("Error when reacting to comment: Invalid action");
     }
 });
 exports.default = ReactComment;

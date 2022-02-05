@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __importDefault(require("axios"));
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const server_1 = require("../../../server");
 const dotenv = __importStar(require("dotenv"));
 const crypto = __importStar(require("crypto"));
@@ -27,7 +27,7 @@ const moment_1 = __importDefault(require("moment"));
 
 dotenv.config();
 
-const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const register = async(req, res, next) => {
     // Local variables
     let avatar_uri = ""; // avatar (user)
     let cover_uri = ""; // cover (user)
@@ -35,7 +35,8 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     let long = "";
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
     // Required parameters
-    let req_body = yield req.body;
+    let req_body = req.body;
+    // console.log(req_body)
     let first_name = req_body.first_name;
     let last_name = req_body.last_name;
     let email = req_body.email;
@@ -76,16 +77,18 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         let info_lives = req_body.info_lives; // location_formatted (geo)
         let lives = info_lives.split(",");
         let country = lives[lives.length - 1];
+        country = country.replace(" ", '');
         let city = lives[0];
         let state = "";
         if (info_lives.length > 2) {
             state = lives[lives.length - 2];
         }
         let country_code = ""; // location_country_iso (geo)
-        axios.get("https://restcountries.com/v3.1/name/" + country)
-        .then(fetch_country => {
-            console.log(fetch_country)
-            let fetch_res = JSON.parse(JSON.stringify(fetch_country.data));
+        const fetch_country = await fetch("https://restcountries.com/v3.1/name/" + country, {
+            "method": "GET"
+        })
+        try {
+            let fetch_res = JSON.parse(JSON.stringify(await fetch_country.json()));
             if (!Array.isArray(fetch_res)) {
                 return res.status(400).json({
                     message: "Error when finding living country ISO code: " + fetch_res.message
@@ -94,39 +97,29 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             else {
                 country_code = fetch_res[0].cca3;
             }
-        })
-        .catch( error => {
+        }
+        catch(error) {
             return res.status(400).json({
                 message: "Error when finding country ISO code: " + error
             })
-        });
+        }
 
         // Get latitude & longitude
-        axios.get(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json`, {
-            params: {
-                fields: "geometry",
-                input: location,
-                inputtype: "textquery",
-                key: process.env.MAPS_KEY
-            }
+        const result = await fetch("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=geometry&input=" + info_lives + "&inputtype=textquery&key=" + process.env.MAPS_KEY, {
+            "method": "GET"
         })
-        .then(result => {
-            let data = JSON.parse(JSON.stringify(result.data));
-            if (data.status != "OK") {
-                return res.status(400).json({
-                    message: "Error when finding living location coordinates: " + data.error_message
-                });
-            }
-            else {
-                lat = data.candidates[0].geometry.location.lat;
-                long = data.candidates[0].geometry.location.lng;
-            }
-        })
-        .catch( error => {
+        try {
+            let data = JSON.parse(JSON.stringify(await result.json()));
+            lat = data.candidates[0].geometry.location.lat;
+            long = data.candidates[0].geometry.location.lng;
+            console.log(lat)
+            console.log(long)
+        }
+        catch(error) {
             return res.status(400).json({
                 message: "Error when finding location coordinates: " + error
             })
-        });
+        }
         // Add to database
         var sql = "SELECT id, location_formatted FROM geo WHERE location_formatted = ?";
         server_1.conn.getConnector().query(sql, [info_lives], (err, geo_rows) => {
@@ -180,5 +173,5 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             }
         });
     }
-});
+}
 exports.default = register;

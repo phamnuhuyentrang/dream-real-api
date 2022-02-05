@@ -37,6 +37,8 @@ const upload = multer({
         bucket: process.env.AWS_BUCKET_NAME,
         acl: 'public-read',
         key: function(req, file, cb) {
+            let extension_arr = file.mimetype.split("/")
+            let extension = extension_arr[extension_arr.length - 1]
             cb(null, file.fieldname + "/" + req.body.username + "." + extension)
         }
     })
@@ -65,16 +67,16 @@ app.get("/", (req, res) => {
     });
 })
 
-app.post("/usn_validity", main_controller_1.default.check_usn_validity, (req, res) => {
-    return res.status(200).json({
-        message: "Username is available to use"
-    });
-});
-app.post("/email_validity", main_controller_1.default.check_email_validity, (req, res) => {
-    return res.status(200).json({
-        message: "Email is available to use"
-    });
-});
+// app.post("/usn_validity", main_controller_1.default.check_usn_validity, (req, res) => {
+//     return res.status(200).json({
+//         message: "Username is available to use"
+//     });
+// });
+// app.post("/email_validity", main_controller_1.default.check_email_validity, (req, res) => {
+//     return res.status(200).json({
+//         message: "Email is available to use"
+//     });
+// });
 app.post("/register", [main_controller_1.default.check_usn_validity, main_controller_1.default.check_email_validity, upload.fields([{name: "avatar", maxCount: 1}, {name: "cover", maxCount: 1}]),main_controller_1.default.register], (req, res) => {
     return res.status(200).json({
         message: "New user signed up successfully"
@@ -88,7 +90,7 @@ app.post("/login", main_controller_1.default.login, (req, res) => {
         secure: process.env.NODE_ENV === "production",
     })
         .status(200)
-        .json({ message: "Logged in successfully 😊 👌" });
+        .json({ id: req.id, message: "Logged in successfully 😊 👌" });
 });
 app.get("/logout", main_controller_1.default.authorization, (req, res) => {
     return res
@@ -176,7 +178,7 @@ app.post("/unfriend", main_controller_1.default.unFriend, (req, res) => {
 const start = () => {
     let port = process.env.PORT;
     try {
-        app.listen(port, () => {
+        app.listen(port, "192.168.1.25", () => {
             console.log(`Api up and running at: http://localhost:${port}`);
         });
     }
