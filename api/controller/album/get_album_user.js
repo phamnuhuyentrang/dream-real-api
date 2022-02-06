@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("../../../server");
 const getAlbumUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let req_body = req.query;
+    console.log(req_body)
     let offset = req_body.offset;
     let user_id = req_body.user_id;
     let user_react_id = req_body.user_react_id;

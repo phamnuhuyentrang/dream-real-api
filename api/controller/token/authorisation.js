@@ -15,17 +15,27 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const authorization = (req, res, next) => {
     const token = req.cookies.access_token;
+    console.log(req.cookies)
     if (!token) {
-        return res.sendStatus(403);
+        return res.status(200).json({
+            message: "Forbidden. Cookie needed",
+            success: false
+        });
     }
-    try {
-        const data = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-        req.username = data.username;
-        req.role = data.role;
-        return next();
-    }
-    catch (_a) {
-        return res.sendStatus(403);
+    else {
+        try {
+            const data = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+            req.username = data.username;
+            req.role = data.role;
+            return next();
+        }
+        catch (_a) {
+            console.log(_a)
+            return res.status(200).json({
+                message: "Forbidden. Cookie invalid",
+                success: false
+            });
+        }
     }
 };
 exports.default = authorization;

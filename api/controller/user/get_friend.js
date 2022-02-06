@@ -24,6 +24,21 @@ const getFriends = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         }
         else {
             req.friend = JSON.parse(JSON.stringify(rows));
+            // return next();
+        }
+    });
+    
+    sql = "SELECT u.id as user_id, COUNT(u.id) as nb_friends FROM (SELECT f1.user_id, f1.friend_id, f1.status FROM friend f1 UNION SELECT f2.friend_id AS user_id, f2.user_id AS friend_id, f2.status FROM friend f2) fr JOIN user u ON fr.friend_id = u.id  WHERE fr.status = ? AND u.id = ? GROUP BY u.id;"
+    server_1.conn.getConnector().query(sql, ["accepted", user_id], (err, rows) => {
+        if (err) {
+            return res.status(200).json({
+                success: false,
+                message: "Error when counting friend: " + err
+            });
+        }
+        else {
+            let rs = JSON.parse(JSON.stringify(rows));
+            req.nb_friends = rs[0].nb_friends;
             return next();
         }
     });

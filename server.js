@@ -113,8 +113,13 @@ app.get("/album_trending", main_controller_1.default.getAlbumTrending, (req, res
     return res.status(200).json({success: true, albums: req.album});
 });
 app.get("/album_user", [main_controller_1.default.authorization, main_controller_1.default.getAlbumUser], (req, res) => {
+    console.log("Returned album: " + req.album);
     return res.status(200).json({success: true, albums: req.album});
 });
+// app.get("/album_user", main_controller_1.default.getAlbumUser, (req, res) => {
+//     console.log("Returned album: " + req.album);
+//     return res.status(200).json({success: true, albums: req.album});
+// });
 app.get("/album_favorite", [main_controller_1.default.authorization, main_controller_1.default.getAlbumFavorite], (req, res) => {
     return res.status(200).json({success: true, albums: req.album});
 });
@@ -149,12 +154,20 @@ app.post("/react_comment", [main_controller_1.default.ReactComment], (req, res) 
     });
 });
 app.get("/get_followers", [main_controller_1.default.authorization, main_controller_1.default.getFollower], (req, res) => {
-    return res.status(200).json({success: true, followers: req.follower});
+    return res.status(200).json({success: true, followers: req.follower, nb_followers: req.nb_followers});
 
 });
 app.get("/get_following", [main_controller_1.default.authorization, main_controller_1.default.getFollowing], (req, res) => {
-    return res.status(200).json({success: true, following: req.following});
+    return res.status(200).json({success: true, following: req.following, nb_following: req.nb_following});
 });
+// app.get("/get_followers", main_controller_1.default.getFollower, (req, res) => {
+//     return res.status(200).json({success: true, followers: req.follower, nb_followers: req.nb_followers});
+
+// });
+// app.get("/get_following", main_controller_1.default.getFollowing, (req, res) => {
+//     return res.status(200).json({success: true, following: req.following, nb_following: req.nb_following});
+// });
+
 app.post("/follow", main_controller_1.default.Follow, (req, res) => {
     return res.status(200).json({
         success: true,
@@ -183,14 +196,24 @@ app.post("/answer_friend_request", main_controller_1.default.answerRequestFriend
     });
 });
 app.get("/get_friends", [main_controller_1.default.authorization, main_controller_1.default.getFriends], (req, res) => {
-    return res.status(200).json({success: true, friends: req.friend});
+    return res.status(200).json({success: true, friends: req.friend, nb_friends: req.nb_friends});
 });
+// app.get("/get_friends", main_controller_1.default.getFriends, (req, res) => {
+//     return res.status(200).json({success: true, friends: req.friend, nb_friends: req.nb_friends});
+// });
 app.post("/unfriend", main_controller_1.default.unFriend, (req, res) => {
     return res.status(200).json({
         success: true,
         message: "You have unfriended a person"
     });
 });
+
+app.get("/destination", main_controller_1.default.getDestination, (req, res) => {
+    return res.status(200).json({
+        success: true,
+        destinations: req.destination
+    })
+})
 const start = () => {
     let port = process.env.PORT;
     let host = process.env.HOST;

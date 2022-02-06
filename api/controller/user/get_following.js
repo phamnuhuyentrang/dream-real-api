@@ -24,6 +24,21 @@ const getFollowing = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         }
         else {
             req.following = JSON.parse(JSON.stringify(rows));
+            // return next();
+        }
+    });
+
+    sql = "SELECT coalesce(count(u.id), 0) as nb_following FROM user u LEFT JOIN follow f ON f.following_id = u.id WHERE f.follower_id = ?"
+    server_1.conn.getConnector().query(sql, [user_id], (err, rows) => {
+        if (err) {
+            return res.status(200).json({
+                success: false,
+                message: "Error when counting following: " + err
+            });
+        }
+        else {
+            let rs = JSON.parse(JSON.stringify(rows));
+            req.nb_following = rs[0].nb_following;
             return next();
         }
     });
