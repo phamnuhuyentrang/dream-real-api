@@ -13,7 +13,7 @@ const server_1 = require("../../../server");
 const check_email_validity = (req, res, next) =>  {
     let req_body = req.body;
     let email = req_body.email;
-    console.log("Check email avalability: " + email)
+
     // Check if username is already in use
     var sql = "SELECT email FROM user WHERE email = ?";
     server_1.conn.getConnector().query(sql, [email], (err, email_res) => {
@@ -25,7 +25,7 @@ const check_email_validity = (req, res, next) =>  {
         }
         else {
             if (JSON.parse(JSON.stringify(email_res))[0] != undefined) {
-                console.log("Email has already been used")
+
                 return res.status(200).json({
                     success: false,
                     message: "Email has already been used"

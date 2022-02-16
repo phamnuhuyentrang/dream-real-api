@@ -28,7 +28,7 @@ const moment_1 = __importDefault(require("moment"));
 dotenv.config();
 
 const register = async(req, res, next) => {
-    console.log("Register")
+
     // Local variables
     let avatar_uri = ""; // avatar (user)
     let cover_uri = ""; // cover (user)
@@ -37,7 +37,7 @@ const register = async(req, res, next) => {
     let created_at = moment_1.default(Date.now()).format("YYYY-MM-DD hh:mm:ss");
     // Required parameters
     let req_body = req.body;
-    // console.log(req_body)
+
     let first_name = req_body.first_name;
     let last_name = req_body.last_name;
     let email = req_body.email;
@@ -116,8 +116,7 @@ const register = async(req, res, next) => {
             let data = JSON.parse(JSON.stringify(await result.json()));
             lat = data.candidates[0].geometry.location.lat;
             long = data.candidates[0].geometry.location.lng;
-            console.log(lat)
-            console.log(long)
+
         }
         catch(error) {
             return res.status(200).json({
@@ -148,7 +147,7 @@ const register = async(req, res, next) => {
                                 message: "Error when saving living location: " + err
                             });
                         }
-                        console.log("Insert into geo successfully");
+
                         // get geo_id
                         geo_id = result_geos.insertId;
                     });

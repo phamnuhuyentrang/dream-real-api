@@ -29,7 +29,20 @@ const addComment = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             });
         }
         else {
-            return next();
+            sql = "WITH RECURSIVE descendants AS (SELECT c.reply_to, c.id FROM comment c UNION ALL SELECT d.reply_to, c.id FROM descendants AS d JOIN comment c ON d.id = c.reply_to) SELECT c.id as comment_id, c.created_at, c.context, u.id as user_id, u.first_name, u.last_name, u.avatar, re.react_count, reply.reply_count, user_react.emoji as user_react FROM comment c LEFT JOIN user u ON c.user_id = u.id LEFT JOIN (SELECT c.id, COUNT(r.emoji) AS react_count FROM comment c JOIN react r ON c.id = r.comment_id GROUP BY c.id) re ON re.id = c.id LEFT JOIN (SELECT reply_to, COUNT(id) AS reply_count FROM descendants WHERE reply_to IS NOT NULL GROUP BY reply_to) reply ON c.id = reply.reply_to LEFT JOIN (SELECT r.emoji, c.id FROM user u LEFT JOIN react r ON u.id = r.user_id LEFT JOIN comment c ON r.comment_id = c.id WHERE u.id = ?) user_react ON user_react.id = c.id WHERE c.id = ?"
+            let inserted_comment_id = rows.insertId;
+            server_1.conn.getConnector().query(sql, [user_id, inserted_comment_id], (err, rows) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: false,
+                        message: "Error when retrive comment: " + err.message
+                    });
+                }
+                else {
+                    req.comment = JSON.parse(JSON.stringify(rows));
+                    return next()
+                }
+            })
         }
     });
 });

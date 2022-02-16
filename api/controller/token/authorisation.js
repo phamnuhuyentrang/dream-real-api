@@ -15,7 +15,7 @@ const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const authorization = (req, res, next) => {
     const token = req.cookies.access_token;
-    console.log(req.cookies)
+
     if (!token) {
         return res.status(200).json({
             message: "Forbidden. Cookie needed",
@@ -30,7 +30,7 @@ const authorization = (req, res, next) => {
             return next();
         }
         catch (_a) {
-            console.log(_a)
+
             return res.status(200).json({
                 message: "Forbidden. Cookie invalid",
                 success: false

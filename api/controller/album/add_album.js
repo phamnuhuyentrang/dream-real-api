@@ -76,15 +76,13 @@ const createAlbum = async (req, res, next) => {
     
     
     // Get location hash
-    const result = await fetch("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=geometry&input=" + info_lives + "&inputtype=textquery&key=" + process.env.MAPS_KEY, {
+    const result = await fetch("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?fields=geometry&input=" + location + "&inputtype=textquery&key=" + process.env.MAPS_KEY, {
         "method": "GET"
     })
     try {
         let data = JSON.parse(JSON.stringify(await result.json()));
         lat = data.candidates[0].geometry.location.lat;
         long = data.candidates[0].geometry.location.lng;
-        console.log(lat)
-        console.log(long)
     }
     catch(error) {
         return res.status(200).json({
@@ -116,7 +114,6 @@ const createAlbum = async (req, res, next) => {
                             message: "Error when saving living location: " + err
                         });
                     }
-                    console.log("Insert into geo successfully");
                     geo_id = result_geos.insertId;
                 });
             }
