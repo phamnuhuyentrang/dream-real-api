@@ -95,7 +95,7 @@ app.post("/login", main_controller_1.default.login, (req, res) => {
         secure: process.env.NODE_ENV === "production",
     })
         .status(200)
-        .json({ success: true, id: req.id, first_name: req.firstname, last_name: req.lastname, avatar: req.avatar, username: req.username, message: "Logged in successfully 😊 👌" });
+        .json({ success: true, id: req.id, first_name: req.firstname, last_name: req.lastname, avatar: req.avatar, cover: req.cover, username: req.username, message: "Logged in successfully 😊 👌" });
 });
 app.get("/logout", main_controller_1.default.authorization, (req, res) => {
     return res

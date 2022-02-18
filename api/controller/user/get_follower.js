@@ -23,23 +23,29 @@ const getFollower = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             });
         }
         else {
-            req.follower = JSON.parse(JSON.stringify(rows));
+            console.log(rows)
+            let r = JSON.parse(JSON.stringify(rows));
+            if (r.length === 0) {
+                req.follower = []
+            }
+            else {
+                req.follower = r
+            }
+            sql = "SELECT coalesce(count(u.id), 0) as nb_followers FROM follow f LEFT JOIN user u ON f.follower_id = u.id WHERE f.following_id = ?"
             // return next();
-        }
-    });
-    
-    sql = "SELECT coalesce(count(u.id), 0) as nb_followers FROM follow f JOIN user u ON f.follower_id = u.id WHERE f.following_id = ?"
-    server_1.conn.getConnector().query(sql, [user_id], (err, rows) => {
-        if (err) {
-            return res.status(200).json({
-                success: false,
-                message: "Error when getting follower: " + err
+            server_1.conn.getConnector().query(sql, [user_id], (err, nbrows) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: false,
+                        message: "Error when getting follower: " + err
+                    });
+                }
+                else {
+                    let rs = JSON.parse(JSON.stringify(nbrows))
+                    req.nb_followers = rs[0].nb_followers;
+                    return next();
+                }
             });
-        }
-        else {
-            let rs = JSON.parse(JSON.stringify(rows))
-            req.nb_followers = rs[0].nb_followers;
-            return next();
         }
     });
 });

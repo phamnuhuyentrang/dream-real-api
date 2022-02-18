@@ -139,7 +139,7 @@ const register = async(req, res, next) => {
                     geo_id = JSON.parse(JSON.stringify(geo_rows))[0].id;
                 }
                 else {
-                    var sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
+                    sql = "INSERT INTO geo (created_at, latitude, longitude, location_city, location_state, location_country, location_country_iso, location_formatted, hash) VALUES ?";
                     server_1.conn.getConnector().query(sql, [[[created_at, lat, long, city, state, country, country_code, info_lives, location_hash]]], (err, result_geos) => {
                         if (err) {
                             return res.status(200).json({
@@ -152,7 +152,7 @@ const register = async(req, res, next) => {
                         geo_id = result_geos.insertId;
                     });
                 }
-                var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at, geo_id) VALUES ?";
+                sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at, geo_id) VALUES ?";
                 server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at, geo_id]]], function (err, result) {
                     if (err) {
                         return res.status(200).json({

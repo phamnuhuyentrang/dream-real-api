@@ -23,7 +23,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     let email = req_body.email;
     let hashed_email = crypto.createHash('md5').update(email).digest('base64');
     let password = crypto.pbkdf2Sync(req_body.password, hashed_email, 1000, 64, "sha512").toString("base64");
-    server_1.conn.getConnector().query("SELECT id, first_name, last_name, avatar, username, role FROM user WHERE email = ? AND password = ?", [email, password], function (err, result) {
+    server_1.conn.getConnector().query("SELECT id, first_name, last_name, avatar, cover_image, username, role FROM user WHERE email = ? AND password = ?", [email, password], function (err, result) {
         if (err) {
             return res.status(200).json({
                 success: false,
@@ -39,6 +39,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
                 req.firstname = data.first_name;
                 req.lastname = data.last_name;
                 req.avatar = data.avatar;
+                req.cover = data.cover_image;
                 return next();
             }
             else {
