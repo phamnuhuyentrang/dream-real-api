@@ -127,7 +127,18 @@ const createAlbum = async (req, res, next) => {
                     });
                 }
                 else {
-                    return next();
+                    sql = "UPDATE user SET sys_score = sys_score + 5 WHERE user.id = ?"
+                    server_1.conn.getConnector().query(sql, [user_id], function (err, updateResult) {
+                        if (err) {
+                            return res.status(200).json({
+                                success: false,
+                                message: "Error when updating score: " + err.message
+                            });
+                        }
+                        else {
+                            return next();
+                        }
+                    })
                 }
             });
         }

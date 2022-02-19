@@ -32,7 +32,18 @@ const ReactAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 });
             }
             else {
-                return next();
+                sql = "UPDATE user JOIN album ON album.user_id = user.id SET user.comm_score = user.comm_score + 5 WHERE album.id = ?"
+                server_1.conn.getConnector().query(sql, [album_id], function (err, updateResult) {
+                    if (err) {
+                        return res.status(200).json({
+                            success: false,
+                            message: "Error when updating score: " + err.message
+                        });
+                    }
+                    else {
+                        return next();
+                    }
+                })
             }
         });
     }
@@ -60,7 +71,18 @@ const ReactAlbum = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 });
             }
             else {
-                return next();
+                sql = "UPDATE user JOIN album ON album.user_id = user.id SET user.comm_score = user.comm_score - 5 WHERE album.id = ?"
+                server_1.conn.getConnector().query(sql, [album_id], function (err, updateResult) {
+                    if (err) {
+                        return res.status(200).json({
+                            success: false,
+                            message: "Error when updating score: " + err.message
+                        });
+                    }
+                    else {
+                        return next();
+                    }
+                })
             }
         });
     }
