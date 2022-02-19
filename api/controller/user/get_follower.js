@@ -23,7 +23,6 @@ const getFollower = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             });
         }
         else {
-            console.log(rows)
             let r = JSON.parse(JSON.stringify(rows));
             if (r.length === 0) {
                 req.follower = []

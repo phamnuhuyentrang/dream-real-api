@@ -162,6 +162,16 @@ app.post("/follow", main_controller_1.default.Follow, (req, res) => {
         message: "You have followed a person"
     });
 });
+
+app.get("/filter_album_by_friend", [main_controller_1.default.authorization, main_controller_1.default.filterAlbumByFriend], (req, res) => {
+    return res.status(200).json({success: true, album: req.album});
+})
+
+app.get("/filter_album_by_following", [main_controller_1.default.authorization, main_controller_1.default.filterAlbumByFollowing], (req, res) => {
+    return res.status(200).json({success: true, album: req.album});
+})
+
+
 app.post("/unfollow", main_controller_1.default.unFollow, (req, res) => {
     return res.status(200).json({
         success: true,
