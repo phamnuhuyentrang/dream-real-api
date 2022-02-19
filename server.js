@@ -171,7 +171,7 @@ app.get("/filter_album_by_following", [main_controller_1.default.authorization, 
     return res.status(200).json({success: true, album: req.album});
 })
 
-app.get("/get_admin", [main_controller_1.default.authorization, main_controller_1.default.getAdmin], (req, res) => {
+app.get("/get_admin", [main_controller_1.default.getAdmin], (req, res) => {
     return res.status(200).json({success: true, admin: req.admin});
 })
 
