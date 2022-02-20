@@ -26,7 +26,8 @@ class CreateTable extends connector_1.default {
                     "`password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL," +
                     "`avatar` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL," +
                     "`cover_image` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL," +
-                    "`score` int(11) DEFAULT 0," +
+                    "`comm_score` int(11) DEFAULT 0," +
+                    "`sys_score` int(11) DEFAULT 0," +
                     "`role` varchar(5) DEFAULT 'user'," +
                     "`created_at` timestamp NULL DEFAULT NULL," +
                     "`updated_at` timestamp NULL DEFAULT NULL," +
@@ -74,6 +75,7 @@ class CreateTable extends connector_1.default {
                     "`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
                     "`title` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL," +
                     "`slug` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL" +
+                    "`url` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL " +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"],
             ["follow", "CREATE TABLE `follow` (" +
                     "`id` int(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT," +

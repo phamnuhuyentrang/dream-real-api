@@ -121,6 +121,11 @@ app.get("/album_favorite", [main_controller_1.default.authorization, main_contro
 app.get("/get_comment", [main_controller_1.default.authorization, main_controller_1.default.getComment], (req, res) => {
     return res.status(200).json({success: true, comments: req.comment});
 });
+
+app.get("/tags", [main_controller_1.default.authorization, main_controller_1.default.getTag], (req, res) => {
+    return res.status(200).json({success: true, tags: req.tags});
+});
+
 app.post("/add_comment", [main_controller_1.default.authorization, main_controller_1.default.addComment], (req, res) => {
     return res.status(200).json({
         success: true,

@@ -263,7 +263,7 @@ class InsertTable extends connector_1.default {
     }
     insertTableUser(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sql = "INSERT INTO user (id, username, first_name, last_name, email, password, avatar, cover_image, score, role, created_at, updated_at, geo_id) VALUES ?";
+            const sql = "INSERT INTO user (id, username, first_name, last_name, email, password, avatar, cover_image, comm_score, role, created_at, updated_at, geo_id) VALUES ?";
             const connection = this.db;
             this.db.query(sql, [data], function (err) {
                 if (err) {
