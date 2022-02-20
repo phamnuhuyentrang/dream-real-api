@@ -16,7 +16,7 @@ const getAlbumUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     let offset = req_body.offset;
     let user_id = req_body.user_id;
     let user_react_id = req_body.user_react_id;
-    var sql = "WITH fr AS (SELECT u.id, u.first_name, u.last_name, u.avatar, u.cover_image, u.sys_score + u.comm_score AS score, dense_rank() OVER ( ORDER BY u.sys_score + u.comm_score DESC ) AS 'rank' FROM user u) SELECT * FROM fr WHERE fr.id = ? ";
+    var sql = "WITH fr AS (SELECT u.id, u.sys_score + u.comm_score AS score, dense_rank() OVER ( ORDER BY u.sys_score + u.comm_score DESC ) AS 'rank' FROM user u) SELECT * FROM fr WHERE fr.id = ? ";
     server_1.conn.getConnector().query(sql, [user_react_id], (err, rows) => {
         if (err) {
             console.log(err)
