@@ -113,7 +113,7 @@ app.get("/album_trending", main_controller_1.default.getAlbumTrending, (req, res
     return res.status(200).json({success: true, albums: req.album});
 });
 app.get("/album_user", [main_controller_1.default.authorization, main_controller_1.default.getAlbumUser], (req, res) => {
-    return res.status(200).json({success: true, albums: req.album});
+    return res.status(200).json({success: true, user: req.user, albums: req.album});
 });
 app.get("/album_favorite", [main_controller_1.default.authorization, main_controller_1.default.getAlbumFavorite], (req, res) => {
     return res.status(200).json({success: true, albums: req.album});
