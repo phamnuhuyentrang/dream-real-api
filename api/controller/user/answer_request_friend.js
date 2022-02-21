@@ -36,7 +36,20 @@ const answerRequestFriend = (req, res, next) => __awaiter(void 0, void 0, void 0
             });
         }
         else {
-            return next();
+            if (action == "decline") {
+                sql = "UPDATE user SET comm_score = comm_score - 5 WHERE user.id = ?";
+                server_1.conn.getConnector().query(sql, [user_id], (err, rows) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: false,
+                            message: "Error when updating point: " + err
+                        });
+                    }
+                    else {
+                        return next();
+                    }
+                })
+            }
         }
     });
 });

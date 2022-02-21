@@ -221,7 +221,7 @@ const start = () => {
     let port = process.env.PORT;
     let host = process.env.HOST;
     try {
-        app.listen(port, () => {
+        app.listen(port, host, () => {
             console.log(`Api up and running at: http://${host}:${port}`);
         });
     }

@@ -29,7 +29,7 @@ const addComment = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             });
         }
         else {
-            sql = "UPDATE user JOIN album ON album.user_id = user.id SET user.comm_score = user.comm_score + 5 WHERE album.id = ?"
+            sql = "UPDATE user u JOIN album a ON (a.user_id = u.id) SET u.comm_score = u.comm_score + 5 WHERE a.id = ?"
             server_1.conn.getConnector().query(sql, [album_id], function (err, updateResult) {
                 if (err) {
                     return res.status(200).json({
