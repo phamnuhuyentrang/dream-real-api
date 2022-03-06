@@ -15,7 +15,7 @@ const allTags = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     let req_body = req.query;
 
     let slug = req_body.slug;
-    var sql = "SELECT id, title, url FROM tag WHERE slug = ?";
+    var sql = "SELECT id, title, url, slug FROM tag WHERE slug = ?";
     server_1.conn.getConnector().query(sql, [slug], (err, rows) => {
         if (err) {
             return res.status(200).json({

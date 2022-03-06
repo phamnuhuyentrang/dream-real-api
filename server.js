@@ -106,7 +106,8 @@ app.get("/logout", main_controller_1.default.authorization, (req, res) => {
 app.post("/new_album", [uploadAlbum.single("image"), main_controller_1.default.createAlbum], (req, res) => {
     return res.status(200).json({
         success: true,
-        message: "Your album is added successfully"
+        message: "Your album is added successfully",
+        album: req.album
     });
 })
 app.get("/album_trending", main_controller_1.default.getAlbumTrending, (req, res) => {
@@ -221,7 +222,7 @@ const start = () => {
     let port = process.env.PORT;
     let host = process.env.HOST;
     try {
-        app.listen(port, () => {
+        app.listen(port, host, () => {
             console.log(`Api up and running at: http://${host}:${port}`);
         });
     }

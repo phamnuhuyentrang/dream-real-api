@@ -152,34 +152,72 @@ const register = async(req, res, next) => {
                         geo_id = result_geos.insertId;
                     });
                 }
-                sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at, geo_id) VALUES ?";
-                server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at, geo_id]]], function (err, result) {
+                var sql = "SELECT username, email FROM user WHERE username = ? OR email = ?";
+                server_1.conn.getConnector().query(sql, [username, email], (err, email_res) => {
                     if (err) {
                         return res.status(200).json({
                             success: false,
-                            message: "Error when creating new user: " + err
+                            message: "Error when verifying email: " + err
                         });
                     }
                     else {
-                        return next();
+                        if (JSON.parse(JSON.stringify(email_res))[0] != undefined) {
+                            return res.status(200).json({
+                                success: false,
+                                message: "Email or username has already been used"
+                            });
+                        }
+                        else {
+                            sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at, geo_id) VALUES ?";
+                            server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at, geo_id]]], function (err, result) {
+                                if (err) {
+                                    return res.status(200).json({
+                                        success: false,
+                                        message: "Error when creating new user: " + err
+                                    });
+                                }
+                                else {
+                                    return next();
+                                }
+                            });
+                        }
                     }
                 });
             }
         });
     }
     else {
-        var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at) VALUES ?";
-        server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at]]], function (err, result) {
+        var sql = "SELECT username, email FROM user WHERE username = ? OR email = ?";
+        server_1.conn.getConnector().query(sql, [username, email], (err, email_res) => {
             if (err) {
                 return res.status(200).json({
                     success: false,
-                    message: "Error when creating new user: " + err
+                    message: "Error when verifying email: " + err
                 });
             }
             else {
-                return next();
+                if (JSON.parse(JSON.stringify(email_res))[0] != undefined) {
+                    return res.status(200).json({
+                        success: false,
+                        message: "Email or username has already been used"
+                    });
+                }
+                else {
+                    var sql = "INSERT INTO user (username, first_name, last_name, email, password, avatar, cover_image, created_at) VALUES ?";
+                    server_1.conn.getConnector().query(sql, [[[username, first_name, last_name, email, password, avatar_uri, cover_uri, created_at]]], function (err, result) {
+                        if (err) {
+                            return res.status(200).json({
+                                success: false,
+                                message: "Error when creating new user: " + err
+                            });
+                        }
+                        else {
+                            return next();
+                        }
+                    });
+                }
             }
-        });
+        })
     }
 }
 exports.default = register;
