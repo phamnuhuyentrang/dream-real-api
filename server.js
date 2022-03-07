@@ -143,13 +143,21 @@ app.post("/reply_to", [main_controller_1.default.authorization, main_controller_
         message: "Your reply is added successfully"
     });
 });
-app.post("/react_album", [main_controller_1.default.ReactAlbum], (req, res) => {
+app.post("/react_album", [main_controller_1.default.authorization, main_controller_1.default.ReactAlbum], (req, res) => {
     return res.status(200).json({
         success: true,
         message: "You have reacted to an album"
     });
 });
-app.post("/react_comment", [main_controller_1.default.ReactComment], (req, res) => {
+
+app.post("/add_to_favorite", [main_controller_1.default.authorization, main_controller_1.default.addToFavorite], (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "You have action favorite to an album"
+    });
+});
+
+app.post("/react_comment", [main_controller_1.default.authorization, main_controller_1.default.ReactComment], (req, res) => {
     return res.status(200).json({
         success: true,
         message: "You have reacted to a comment"
@@ -222,7 +230,7 @@ const start = () => {
     let port = process.env.PORT;
     let host = process.env.HOST;
     try {
-        app.listen(port, host, () => {
+        app.listen(port, () => {
             console.log(`Api up and running at: http://${host}:${port}`);
         });
     }
