@@ -163,6 +163,15 @@ app.post("/react_comment", [main_controller_1.default.authorization, main_contro
         message: "You have reacted to a comment"
     });
 });
+
+app.post("/add_feeling", [main_controller_1.default.authorization, main_controller_1.default.addFeeling], (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "You have added a feeling",
+        id_tag: req.id_tag
+    });
+})
+
 app.get("/get_followers", [main_controller_1.default.authorization, main_controller_1.default.getFollower], (req, res) => {
     return res.status(200).json({success: true, followers: req.follower, nb_followers: req.nb_followers});
 
@@ -230,7 +239,7 @@ const start = () => {
     let port = process.env.PORT;
     let host = process.env.HOST;
     try {
-        app.listen(port, () => {
+        app.listen(port, host, () => {
             console.log(`Api up and running at: http://${host}:${port}`);
         });
     }

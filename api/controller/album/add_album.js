@@ -103,7 +103,7 @@ const createAlbum = async (req, res, next) => {
         }
         else {
             if (JSON.parse(JSON.stringify(geo_rows))[0] != undefined) {
-                geo_id = JSON.parse(JSON.stringify(geo_rows))[0].id;
+                let geo_id = JSON.parse(JSON.stringify(geo_rows))[0].id;
                 sql = "INSERT INTO album (created_at, description, geo_id, tag_id, user_id, dream_real, image) VALUES ?";
                 server_1.conn.getConnector().query(sql, [[[created_at, description, geo_id, tag_id, user_id, dream_real, image_uri]]], function (err, result) {
                     if (err) {
