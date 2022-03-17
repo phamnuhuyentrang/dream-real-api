@@ -194,6 +194,14 @@ app.get("/filter_album_by_following", [main_controller_1.default.authorization, 
     return res.status(200).json({success: true, album: req.album});
 })
 
+app.get("/filter_album_by_feeling", [main_controller_1.default.authorization, main_controller_1.default.filterAlbumByFeeling], (req, res) => {
+    return res.status(200).json({success: true, album: req.album});
+})
+
+app.get("/filter_album_by_activity", [main_controller_1.default.authorization, main_controller_1.default.filterAlbumByActivity], (req, res) => {
+    return res.status(200).json({success: true, album: req.album});
+})
+
 app.get("/get_admin", [main_controller_1.default.getAdmin], (req, res) => {
     return res.status(200).json({success: true, admin: req.admin});
 })
