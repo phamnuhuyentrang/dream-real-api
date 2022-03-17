@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("../../../server");
-const filterAlbumByFeeling = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const filterAlbumByActivity = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let req_body = req.query;
     let user_id = req_body.user_id;
     let feeling = req_body.feeling;
@@ -29,4 +29,4 @@ const filterAlbumByFeeling = (req, res, next) => __awaiter(void 0, void 0, void 
         }
     });
 });
-exports.default = filterAlbumByFeeling;
+exports.default = filterAlbumByActivity;
