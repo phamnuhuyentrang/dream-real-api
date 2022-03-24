@@ -237,6 +237,10 @@ app.post("/unfriend", main_controller_1.default.unFriend, (req, res) => {
     });
 });
 
+app.get("/all_user", main_controller_1.default.getUser, (req, res) => {
+    return res.status(200).json({success: true, users: req.user});
+})
+
 app.get("/destination", main_controller_1.default.getDestination, (req, res) => {
     return res.status(200).json({
         success: true,
@@ -247,7 +251,7 @@ const start = () => {
     let port = process.env.PORT;
     let host = process.env.HOST;
     try {
-        app.listen(port, () => {
+        app.listen(port, host, () => {
             console.log(`Api up and running at: http://${host}:${port}`);
         });
     }
