@@ -44,6 +44,7 @@ const createAlbum = async (req, res, next) => {
     let lat = "";
     let long = "";
 
+    let tagged_user = req_body.tagged_user.split(",");
     let image_uri = "album/" + username + "/" + req.file.originalname;
     let lives = location.split(",").map((item) => item.trim());
     let country = lives[lives.length - 1];
@@ -113,6 +114,18 @@ const createAlbum = async (req, res, next) => {
                         });
                     }
                     else {
+                        if (tagged_user != []) {
+                            sql = "INSERT INTO taggers(album_id, user_id) VALUES ?";
+                            server_1.conn.getConnector().query(sql, [tagged_user.map((item) => [result.insertId, item])], function (err, resultTaggers) {
+                                if (err) {
+                                    console.log(err)
+                                    return res.status(200).json({
+                                        success: false,
+                                        message: "Error when adding new album: " + err.message
+                                    });
+                                }
+                            })
+                        }
                         sql = "UPDATE user SET sys_score = sys_score + 5 WHERE user.id = ?"
                         server_1.conn.getConnector().query(sql, [user_id], function (err, updateResult) {
                             if (err) {
@@ -122,8 +135,8 @@ const createAlbum = async (req, res, next) => {
                                 });
                             }
                             else {
-                                sql = "SELECT a.id as album_id, a.created_at, a.description, u.first_name, u.last_name, u.avatar, u.id as user_id, g.location_city, g.location_country, g.longitude, g.latitude, t.title, t.slug, t.url, a.image, co.comment, re.react, user_react.emoji as user_react FROM album a LEFT JOIN geo g ON a.geo_id = g.id LEFT JOIN user u ON a.user_id = u.id LEFT JOIN tag t ON a.tag_id = t.id JOIN (SELECT a.id, COUNT(c.id) as comment FROM album a LEFT JOIN comment c ON a.id = c.album_id GROUP BY a.id) co ON a.id = co.id JOIN (SELECT a.id, COUNT(r.id) as react FROM album a LEFT JOIN react r ON a.id = r.album_id GROUP BY a.id) re ON a.id = re.id LEFT JOIN (SELECT r.emoji, a.id FROM user u LEFT JOIN react r ON u.id = r.user_id LEFT JOIN album a ON r.album_id = a.id WHERE u.id = ?) user_react ON a.id = user_react.id WHERE a.id = ?"
-                                server_1.conn.getConnector().query(sql, [user_id, result.insertId], function (err, fetchRow) {
+                                sql = "WITH tagger AS (SELECT t.album_id as album_id, JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'first_name', u.first_name, 'last_name', u.last_name, 'avatar', u.avatar)) AS user_tagged FROM taggers t JOIN user u ON t.user_id = u.id JOIN album a ON t.album_id = a.id GROUP BY t.album_id) SELECT a.id as album_id, a.created_at, a.description, u.first_name, u.last_name, u.avatar, u.id as user_id, g.location_city, g.location_country, g.longitude, g.latitude, t.title, t.slug, t.url, a.image, co.comment, re.react, user_react.emoji as user_react, IF(isnull(fa.user_id), 0, 1) as favorite, tagger.user_tagged FROM album a LEFT JOIN geo g ON a.geo_id = g.id LEFT JOIN user u ON a.user_id = u.id LEFT JOIN tag t ON a.tag_id = t.id JOIN (SELECT a.id, COUNT(c.id) as comment FROM album a LEFT JOIN comment c ON a.id = c.album_id GROUP BY a.id) co ON a.id = co.id JOIN (SELECT a.id, COUNT(r.id) as react FROM album a LEFT JOIN react r ON a.id = r.album_id GROUP BY a.id) re ON a.id = re.id LEFT JOIN (SELECT r.emoji, a.id FROM user u LEFT JOIN react r ON u.id = r.user_id LEFT JOIN album a ON r.album_id = a.id WHERE u.id = ?) user_react ON a.id = user_react.id LEFT JOIN (SELECT f.album_id, f.user_id FROM favorite f WHERE f.user_id = ?) fa ON a.id = fa.album_id LEFT JOIN tagger ON a.id = tagger.album_id WHERE a.id = ?"
+                                server_1.conn.getConnector().query(sql, [user_id, user_id, result.insertId], function (err, fetchRow) {
                                     if (err) {
                                         return res.status(200).json({
                                             success: false,
@@ -136,7 +149,7 @@ const createAlbum = async (req, res, next) => {
                                     }
                                 })
                             }
-                        })
+                        })  
                     }
                 });
             }
@@ -159,6 +172,18 @@ const createAlbum = async (req, res, next) => {
                                 });
                             }
                             else {
+                                if (tagged_user != []) {
+                                    sql = "INSERT INTO taggers(album_id, user_id) VALUES ?";
+                                    server_1.conn.getConnector().query(sql, [tagged_user.map((item) => [result.insertId, item])], function (err, resultTaggers) {
+                                        if (err) {
+                                            console.log(err)
+                                            return res.status(200).json({
+                                                success: false,
+                                                message: "Error when adding new album: " + err.message
+                                            });
+                                        }
+                                    })
+                                }
                                 sql = "UPDATE user SET sys_score = sys_score + 5 WHERE user.id = ?"
                                 server_1.conn.getConnector().query(sql, [user_id], function (err, updateResult) {
                                     if (err) {
@@ -168,8 +193,8 @@ const createAlbum = async (req, res, next) => {
                                         });
                                     }
                                     else {
-                                        sql = "SELECT a.id as album_id, a.created_at, a.description, u.first_name, u.last_name, u.avatar, u.id as user_id, g.location_city, g.location_country, g.longitude, g.latitude, t.title, t.slug, t.url, a.image, co.comment, re.react, user_react.emoji as user_react FROM album a LEFT JOIN geo g ON a.geo_id = g.id LEFT JOIN user u ON a.user_id = u.id LEFT JOIN tag t ON a.tag_id = t.id JOIN (SELECT a.id, COUNT(c.id) as comment FROM album a LEFT JOIN comment c ON a.id = c.album_id GROUP BY a.id) co ON a.id = co.id JOIN (SELECT a.id, COUNT(r.id) as react FROM album a LEFT JOIN react r ON a.id = r.album_id GROUP BY a.id) re ON a.id = re.id LEFT JOIN (SELECT r.emoji, a.id FROM user u LEFT JOIN react r ON u.id = r.user_id LEFT JOIN album a ON r.album_id = a.id WHERE u.id = ?) user_react ON a.id = user_react.id WHERE a.id = ?"
-                                        server_1.conn.getConnector().query(sql, [user_id, result.insertId], function (err, fetchRow) {
+                                        sql = "WITH tagger AS (SELECT t.album_id as album_id, JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'first_name', u.first_name, 'last_name', u.last_name, 'avatar', u.avatar)) AS user_tagged FROM taggers t JOIN user u ON t.user_id = u.id JOIN album a ON t.album_id = a.id GROUP BY t.album_id) SELECT a.id as album_id, a.created_at, a.description, u.first_name, u.last_name, u.avatar, u.id as user_id, g.location_city, g.location_country, g.longitude, g.latitude, t.title, t.slug, t.url, a.image, co.comment, re.react, user_react.emoji as user_react, IF(isnull(fa.user_id), 0, 1) as favorite, tagger.user_tagged FROM album a LEFT JOIN geo g ON a.geo_id = g.id LEFT JOIN user u ON a.user_id = u.id LEFT JOIN tag t ON a.tag_id = t.id JOIN (SELECT a.id, COUNT(c.id) as comment FROM album a LEFT JOIN comment c ON a.id = c.album_id GROUP BY a.id) co ON a.id = co.id JOIN (SELECT a.id, COUNT(r.id) as react FROM album a LEFT JOIN react r ON a.id = r.album_id GROUP BY a.id) re ON a.id = re.id LEFT JOIN (SELECT r.emoji, a.id FROM user u LEFT JOIN react r ON u.id = r.user_id LEFT JOIN album a ON r.album_id = a.id WHERE u.id = ?) user_react ON a.id = user_react.id LEFT JOIN (SELECT f.album_id, f.user_id FROM favorite f WHERE f.user_id = ?) fa ON a.id = fa.album_id LEFT JOIN tagger ON a.id = tagger.album_id WHERE a.id = ?"
+                                        server_1.conn.getConnector().query(sql, [user_id, user_id, result.insertId], function (err, fetchRow) {
                                             if (err) {
                                                 return res.status(200).json({
                                                     success: false,

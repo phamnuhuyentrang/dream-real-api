@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("../../../server");
 const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var sql = "SELECT u.id as user_id, u.first_name, u.last_name, u.avatar FROM user u";
+    var sql = "SELECT u.id, u.first_name, u.last_name, u.avatar FROM user u";
     server_1.conn.getConnector().query(sql, (err, rows) => {
         if (err) {
             return res.status(200).json({
