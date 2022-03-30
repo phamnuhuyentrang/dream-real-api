@@ -241,6 +241,14 @@ app.get("/all_user", main_controller_1.default.getUser, (req, res) => {
     return res.status(200).json({success: true, users: req.user});
 })
 
+app.get("/filter_album_by_destination", main_controller_1.default.filterAlbumByDestination, (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "You have unfriended a person",
+        album: req.album
+    });
+});
+
 app.get("/destination", main_controller_1.default.getDestination, (req, res) => {
     return res.status(200).json({
         success: true,
